@@ -1,0 +1,67 @@
+package edu.iastate.mlwymore.carbondiary;
+
+import android.content.Context;
+import android.util.Log;
+
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+public class CarbonDiaryViewModel extends ViewModel {
+    public MutableLiveData<CarbonDiary> carbonDiary = new MutableLiveData<>();
+
+    public CarbonDiaryViewModel() {
+        carbonDiary.setValue(new CarbonDiary());
+    }
+
+    public void addEntry(String type, double amount) {
+        CarbonDiary diary = carbonDiary.getValue();
+        if(diary != null) {
+            diary.addEntry(type, amount);
+            carbonDiary.setValue(diary);
+        }
+    }
+
+    public void removeEntry(CarbonDiaryEntry entry) {
+        CarbonDiary diary = carbonDiary.getValue();
+        if(diary != null) {
+            diary.removeEntry(entry);
+            carbonDiary.setValue(diary);
+        }
+    }
+
+    public void write(Context context, String filename) {
+        FileOutputStream fos;
+        ObjectOutputStream oos;
+
+        try {
+            fos = context.openFileOutput("carbonDiary", Context.MODE_PRIVATE);
+            oos = new ObjectOutputStream(fos);
+            oos.writeObject(carbonDiary.getValue());
+            oos.close();
+            fos.close();
+            Log.d("Model", "Changes written");
+        } catch(Exception e) {
+            Log.d("Model", "Exception on saving", e);
+        }
+    }
+
+    public void read(Context context, String filename) {
+        FileInputStream fos;
+        ObjectInputStream oos;
+
+        try {
+            fos = new FileInputStream(context.getFileStreamPath(filename));
+            oos = new ObjectInputStream(fos);
+            carbonDiary.setValue((CarbonDiary) oos.readObject());
+
+            oos.close();
+            fos.close();
+        } catch(Exception e) {
+            Log.d("Model", "Exception on loading", e);
+        }
+    }
