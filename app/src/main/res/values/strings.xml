@@ -11,8 +11,6 @@
     <string name="event_form_details">Details</string>
     <string name="event_form_startdate">Start Date</string>
     <string name="event_form_enddate">End Date</string>
-    <string name="addbutton">Add</string>
-    <string name="cancelbutton">Cancel</string>
     <string name="add_event_button">Add Event</string>
     <string name="menu_add_event">Add Event</string>
 
