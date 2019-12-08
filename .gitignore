@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="AndroidLayouts">
-    <shared>
-      <config />
-    </shared>
-  </component>
-  <component name="ChangeListManager">
-    <list def
-=======
 # Built application files
 *.apk
 *.ap_
@@ -76,4 +65,3 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
->>>>>>> fef58bfa78d52737431a01d46f53f1aaca37a8c9
