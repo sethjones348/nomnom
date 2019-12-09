@@ -68,46 +68,36 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e(TAG, "Can't find style. Error: ", e);
         }
 
+        double campusLat = 42.025316;
+        double campusLong = -93.646408;
+
+        LatLng campus = new LatLng(campusLat, campusLong);
+
+        //zoom the map into campus upon opening
+        mMap.moveCamera(CameraUpdateFactory.zoomTo(16.0f)); //Range of 2.0 to 21.0
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(campus));
+
+
         mFusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
                         if(location != null) {
-                            // Add a marker in ames and move the camera
-                            double amesLat = 42.025316;
-                            double amesLong = -93.646408;
 
-                            LatLng ames = new LatLng(amesLat, amesLong);
-
+                            // Add a marker at the user's current location
                             double curLat = location.getLatitude();
                             double curLong = location.getLongitude();
 
                             LatLng curLocation = new LatLng(curLat, curLong);
 
                             mMap.addMarker(new MarkerOptions().position(curLocation).title("Current Location"));
-
-                            mMap.moveCamera(CameraUpdateFactory.zoomTo(17.0f)); //Range of 2.0 to 21.0
-
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(ames));
-
-                            //Location.distanceBetween(curLat,curLong,bloomingtonAddress.get(0).getLatitude(),bloomingtonAddress.get(0).getLongitude(),distance);
-
-                            //Toast.makeText(MapsActivity.this, "Distance from Bloomington, Indiana is " + distance[0]/1609.34 + " miles", Toast.LENGTH_LONG).show();
                         }
                     }
 
                 }).addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                // Add a marker in ames and move the camera
-                double amesLat = 42.025316;
-                double amesLong = -93.646408;
-
-                LatLng ames = new LatLng(amesLat, amesLong);
-
-                mMap.addMarker(new MarkerOptions().position(ames).title("Ames"));
-                mMap.moveCamera(CameraUpdateFactory.zoomTo(12.0f)); //Range of 2.0 to 21.0
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(ames));
+                // Do nothing
             }
         });
 
