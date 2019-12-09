@@ -13,5 +13,6 @@
     <string name="event_form_enddate">End Date</string>
     <string name="add_event_button">Add Event</string>
     <string name="menu_add_event">Add Event</string>
+    <string name="title_activity_main">Map</string>
 
 </resources>
