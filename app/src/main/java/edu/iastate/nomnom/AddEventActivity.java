@@ -20,4 +20,10 @@ public class AddEventActivity extends AppCompatActivity {
         //intent.putExtra("newEvent", event);
         return intent;
     }
+
+    public void onClickAdd(View view) {
+        Intent main = MainActivity.createIntent(this);
+        startActivity(main);
+    }
+
 }
