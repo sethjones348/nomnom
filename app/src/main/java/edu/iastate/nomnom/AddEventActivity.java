@@ -3,6 +3,7 @@ package edu.iastate.nomnom;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,4 +21,6 @@ public class AddEventActivity extends AppCompatActivity {
         return intent;
     }
 
+    public void goToAddEvent(View view) {
+    }
 }
