@@ -20,7 +20,4 @@ public class AddEventActivity extends AppCompatActivity {
         //intent.putExtra("newEvent", event);
         return intent;
     }
-
-    public void goToAddEvent(View view) {
-    }
 }
