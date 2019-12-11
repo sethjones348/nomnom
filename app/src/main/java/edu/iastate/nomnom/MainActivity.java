@@ -7,6 +7,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
@@ -101,5 +103,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+    }
+    public static Intent createIntent(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        return intent;
     }
 }
