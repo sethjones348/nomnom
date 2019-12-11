@@ -3,6 +3,7 @@ package edu.iastate.nomnom;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,6 +19,11 @@ public class AddEventActivity extends AppCompatActivity {
         Intent intent = new Intent(context, AddEventActivity.class);
         //intent.putExtra("newEvent", event);
         return intent;
+    }
+
+    public void onClickAdd(View view) {
+        Intent main = MainActivity.createIntent(this);
+        startActivity(main);
     }
 
 }
