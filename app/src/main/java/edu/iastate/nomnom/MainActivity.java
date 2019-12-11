@@ -14,6 +14,7 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -104,8 +105,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
     }
+
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         return intent;
+    }
+
+    public void goToAddEvent(View view) {
+        Intent myIntent = AddEventActivity.createIntent(view.getContext());
+        startActivity(myIntent);
     }
 }
