@@ -14,7 +14,7 @@
         tools:context=".MainActivity" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/add_event"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#359c5e"
@@ -25,6 +25,20 @@
         android:layout_margin="5dp"
         android:text="@string/add_event_button"
         android:textColor="#ffffff"
-        android:onClick="goToAddEvent"/>
+        android:onClick="onAddEventClicked"/>
+
+    <Button
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#359c5e"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:padding="8dp"
+        android:layout_margin="5dp"
+        android:text="@string/cancel_button"
+        android:textColor="#ffffff"
+        android:onClick="onCancelClicked"/>
 
 </RelativeLayout>

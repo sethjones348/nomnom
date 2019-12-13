@@ -48,12 +48,13 @@
                     android:text="@string/event_form_location"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <TextView
+                <EditText
                     android:id="@+id/locationInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="20dp"
-                    >Location</TextView>
+                    android:hint="Outside of the library"
+                    />
 
                 <TextView
                     android:id="@+id/startText2"
@@ -98,7 +99,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="20dp"
-                    >Details</EditText>
+                    android:hint="Free ice cream!"
+                    />
 
         </LinearLayout>
 

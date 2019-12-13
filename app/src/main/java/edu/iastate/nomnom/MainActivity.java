@@ -15,6 +15,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
@@ -54,6 +55,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         addEvent = false;
 
         addEventLocation = null;
+
+        findViewById(R.id.cancel).setVisibility(View.GONE);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -122,11 +125,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         return intent;
     }
 
-    public void goToAddEvent(View view) {
+    public void onAddEventClicked(View view) {
+        Button add_event = findViewById(R.id.add_event);
+        Button cancel_button = findViewById(R.id.cancel);
+
+        add_event.setVisibility(View.GONE);
+        cancel_button.setVisibility(View.VISIBLE);
+                
         addEvent = true;
-        Toast.makeText(MainActivity.this, "Tap where you want to add an event", Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
     }
 
+    public void onCancelClicked(View view){
+        addEvent = false;
+
+        view.setVisibility(View.GONE);
+        findViewById(R.id.add_event).setVisibility(View.VISIBLE);
+    }
     @Override
     public void onMapClick(LatLng latLng) {
         if(addEvent) {
