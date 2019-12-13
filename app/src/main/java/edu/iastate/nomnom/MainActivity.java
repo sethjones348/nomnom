@@ -15,6 +15,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +29,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     private static final String TAG = " ";
 
@@ -36,14 +37,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
 
+    private boolean addEvent;
+
+    private LatLng addEventLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        addEvent = false;
+
+        addEventLocation = null;
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -59,6 +69,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMapClickListener(this);
 
         try {
             boolean success = googleMap.setMapStyle(
@@ -112,7 +123,18 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void goToAddEvent(View view) {
-        Intent myIntent = AddEventActivity.createIntent(view.getContext());
-        startActivity(myIntent);
+        addEvent = true;
+        Toast.makeText(MainActivity.this, "Tap where you want to add an event", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        if(addEvent) {
+            addEventLocation = latLng;
+            addEvent = false;
+
+            Intent myIntent = AddEventActivity.createIntent(this.getApplicationContext(), addEventLocation);
+            startActivity(myIntent);
+        }
     }
 }
