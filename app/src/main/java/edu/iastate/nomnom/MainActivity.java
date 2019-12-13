@@ -15,6 +15,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
@@ -123,6 +124,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void goToAddEvent(View view) {
+        Button add_event = findViewById(R.id.add_event);
+        add_event.setVisibility(View.GONE);
+                
         addEvent = true;
         Toast.makeText(MainActivity.this, "Tap where you want to add an event", Toast.LENGTH_LONG).show();
     }

@@ -22,10 +22,6 @@ public class AddEventActivity extends AppCompatActivity {
 
         eventLocation = new LatLng(getIntent().getDoubleExtra("eventLatitude", 0.0),
                                    getIntent().getDoubleExtra("eventLongitude", 0.0));
-
-        TextView location = findViewById(R.id.locationInput);
-
-        location.setText(eventLocation.longitude + ", " + eventLocation.latitude);
     }
 
     public static Intent createIntent(Context context, LatLng latLng) {

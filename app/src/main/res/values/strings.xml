@@ -5,7 +5,7 @@
     <string name="title_activity_add_event">AddEventActivity</string>
     <string name="title_activity_event_details">EventDetailsActivity</string>
     <string name="event_form_title">Title</string>
-    <string name="event_form_location">Location</string>
+    <string name="event_form_location">Location Details</string>
     <string name="event_form_start">Start Time</string>
     <string name="event_form_end">End Time</string>
     <string name="event_form_details">Details</string>
