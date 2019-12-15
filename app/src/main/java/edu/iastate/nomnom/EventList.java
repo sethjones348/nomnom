@@ -6,7 +6,8 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 
 public class EventList extends ViewModel {
-    private MutableLiveData<ArrayList<Event>> eventList;
+
+    public transient MutableLiveData<ArrayList<Event>> eventList = new MutableLiveData<>();
 
     public EventList(){
         eventList = new MutableLiveData<>();

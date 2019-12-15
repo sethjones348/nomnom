@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Context;
@@ -46,7 +47,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LatLng addEventLocation;
 
-    private EventList eventList = new EventList();
+    private EventList eventList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        eventList = new ViewModelProvider(this,
+                new ViewModelProvider.NewInstanceFactory()).get(EventList.class);
+
+        eventList.eventList.observe(this, this);
 
         addEvent = false;
 
