@@ -3,12 +3,15 @@ package edu.iastate.nomnom;
 import android.net.Uri;
 
 import com.google.android.gms.maps.model.LatLng;
+
 //import androidx.room.ColumnInfo;
 //import androidx.room.Entity;
 //import androidx.room.PrimaryKey;
+import com.google.firebase.database.DatabaseReference;
 
-public class Event {
 //    @Entity(tableName = "event")
+public class Event {
+
     private int eventId;
 
     private String title;
@@ -23,14 +26,16 @@ public class Event {
 
     private LatLng location;
 
+    private DatabaseReference imgRef;
 
-    public Event(String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
+    public Event(String title, String food, LatLng location, String locationDetails, String startTime, String endTime, DatabaseReference imgRef) {
         this.title = title;
         this.location = location;
         this.locationDetails = locationDetails;
         this.startTime = startTime;
         this.endTime = endTime;
         this.food = food;
+        this.imgRef = imgRef;
     }
 
     public int getEventId() {
@@ -88,5 +93,11 @@ public class Event {
     public void setFood(String details) {
         this.food = details;
     }
+    public DatabaseReference getImgRef() {
+        return imgRef;
+    }
 
+    public void setImgRef(DatabaseReference imgRef) {
+        this.imgRef = imgRef;
+    }
 }
