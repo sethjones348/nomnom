@@ -68,24 +68,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         addEventLocation = null;
 
-        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
-
-        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
-
-        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
-
-        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-
-        event1.setEventId(0);
-        event2.setEventId(1);
-        event3.setEventId(2);
-
-        eventList.addEvent(event1);
-        eventList.addEvent(event2);
-        eventList.addEvent(event3);
-
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -147,7 +129,32 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // Do nothing
             }
         });
-        placeMarkers();
+        /*
+        ToDo FireBaseStuff
+        update the eventList object here
+         */
+
+        ArrayList<Event> events = new ArrayList<>();
+
+        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
+
+        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
+
+        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
+
+        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm");
+        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm");
+        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm");
+
+        event1.setEventId(0);
+        event2.setEventId(1);
+        event3.setEventId(2);
+
+        events.add(event1);
+        events.add(event2);
+        events.add(event3);
+
+        eventList.eventList.setValue(events);
     }
 
     public static Intent createIntent(Context context) {
@@ -198,5 +205,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onChanged(ArrayList<Event> events) {
+        if(mMap != null) {
+            placeMarkers();
+        }
     }
 }

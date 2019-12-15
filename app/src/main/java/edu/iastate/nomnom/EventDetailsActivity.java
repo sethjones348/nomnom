@@ -20,7 +20,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         int eventId = getIntent().getIntExtra("eventId", 0);
 
         //Psuedo code for what this activity will need to do
-        /*
+        /* ToDo Amith this is for you
         this.event = Database(eventId)
          */
         //This toast is only here to test if the id was succesfully sent through the intent
