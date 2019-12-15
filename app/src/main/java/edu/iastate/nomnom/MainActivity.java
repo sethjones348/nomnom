@@ -147,7 +147,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // Do nothing
             }
         });
-        placeMarkers(eventList.getEventList().getValue());
+        placeMarkers();
     }
 
     public static Intent createIntent(Context context) {
@@ -183,8 +183,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void placeMarkers(ArrayList<Event> events){
-        for(final Event e: events){
+    private void placeMarkers(){
+        for(final Event e: eventList.eventList.getValue()){
             mMap.addMarker(new MarkerOptions().position(e.getLocation()).title(e.getTitle() + ": " + e.getFood())).setTag(e.getEventId());
         }
     }
