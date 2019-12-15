@@ -1,5 +1,7 @@
 package edu.iastate.nomnom;
 
+import android.net.Uri;
+
 import com.google.android.gms.maps.model.LatLng;
 //import androidx.room.ColumnInfo;
 //import androidx.room.Entity;
@@ -20,6 +22,7 @@ public class Event {
     private String endTime;
 
     private LatLng location;
+
 
     public Event(String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
         this.title = title;
@@ -85,4 +88,5 @@ public class Event {
     public void setFood(String details) {
         this.food = details;
     }
+
 }
