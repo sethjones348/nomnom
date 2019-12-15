@@ -129,9 +129,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // Do nothing
             }
         });
-        /*
-        ToDo FireBaseStuff
+
+        /* ToDo FireBaseStuff - Zach attack
         update the eventList object here
+        and then delete the test cases when you are done
          */
 
         ArrayList<Event> events = new ArrayList<>();
