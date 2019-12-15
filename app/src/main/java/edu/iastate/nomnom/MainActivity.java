@@ -86,8 +86,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         eventList.addEvent(event2);
         eventList.addEvent(event3);
 
-
-
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -149,6 +147,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // Do nothing
             }
         });
+        placeMarkers(eventList.getEventList().getValue());
     }
 
     public static Intent createIntent(Context context) {
@@ -199,6 +198,5 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onChanged(ArrayList<Event> events) {
-        placeMarkers(events);
     }
 }

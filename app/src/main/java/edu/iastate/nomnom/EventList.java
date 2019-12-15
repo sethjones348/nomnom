@@ -7,10 +7,11 @@ import java.util.ArrayList;
 
 public class EventList extends ViewModel {
 
-    public transient MutableLiveData<ArrayList<Event>> eventList = new MutableLiveData<>();
+    public transient MutableLiveData<ArrayList<Event>> eventList;
 
     public EventList(){
         eventList = new MutableLiveData<>();
+        eventList.setValue(new ArrayList<Event>());
     }
 
     public MutableLiveData<ArrayList<Event>> getEventList() {
