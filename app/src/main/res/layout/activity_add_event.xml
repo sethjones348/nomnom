@@ -83,8 +83,8 @@
                 <TimePicker
                     android:id="@+id/start_time_picker"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:timePickerMode="spinner"/>
+                    android:layout_height="108dp"
+                    android:timePickerMode="spinner" />
 
                 <TextView
                     android:id="@+id/endText2"
@@ -97,8 +97,22 @@
                 <TimePicker
                     android:id="@+id/end_time_picker"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:timePickerMode="spinner"/>
+                    android:layout_height="131dp"
+                    android:timePickerMode="spinner" />
+
+                <Button
+                    android:id="@+id/photoButton"
+                    android:layout_width="112dp"
+                    android:layout_height="63dp"
+                    android:text="@string/addPhoto" />
+
+                <ImageView
+                    android:id="@+id/photoPreview"
+                    android:layout_width="162dp"
+                    android:layout_height="118dp"
+                    android:layout_weight="0.4"
+
+                    />
 
         </LinearLayout>
 
