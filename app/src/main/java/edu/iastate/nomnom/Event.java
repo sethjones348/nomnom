@@ -1,39 +1,88 @@
 package edu.iastate.nomnom;
 
-public class Event {
-    private int time;
+import com.google.android.gms.maps.model.LatLng;
+//import androidx.room.ColumnInfo;
+//import androidx.room.Entity;
+//import androidx.room.PrimaryKey;
 
-    private String location;
+public class Event {
+//    @Entity(tableName = "event")
+    private int eventId;
+
+    private String title;
 
     private String food;
 
-    public Event(int time, String location, String food){
-        this.time = time;
+    private String locationDetails;
+
+    private String startTime;
+
+    private String endTime;
+
+    private LatLng location;
+
+    public Event(String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
+        this.title = title;
         this.location = location;
+        this.locationDetails = locationDetails;
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.food = food;
     }
-    
-    public int getTime() {
-        return time;
+
+    public int getEventId() {
+        return eventId;
     }
 
-    public void setTime(int time) {
-        this.time = time;
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
     }
 
-    public String getLocation() {
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public LatLng getLocation(){
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(LatLng location){
         this.location = location;
+    }
+
+    public String getLocationDetails() {
+        return locationDetails;
+    }
+
+    public void setLocationDetails(String locationDetails) {
+        this.locationDetails = locationDetails;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public String getFood() {
         return food;
     }
 
-    public void setFood(String food) {
-        this.food = food;
+    public void setFood(String details) {
+        this.food = details;
     }
 }

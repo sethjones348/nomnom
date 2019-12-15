@@ -41,6 +41,22 @@
                     >Title</EditText>
 
                 <TextView
+                    android:id="@+id/deetsText2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="3dp"
+                    android:text="@string/event_form_details"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <EditText
+                    android:id="@+id/deetsInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:hint="Free ice cream!"
+                    />
+
+                <TextView
                     android:id="@+id/locationText2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -64,12 +80,11 @@
                     android:text="@string/event_form_start"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <EditText
-                    android:id="@+id/startInput"
-                    android:layout_width="match_parent"
+                <TimePicker
+                    android:id="@+id/start_time_picker"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    >Start Time</EditText>
+                    android:timePickerMode="spinner"/>
 
                 <TextView
                     android:id="@+id/endText2"
@@ -79,28 +94,11 @@
                     android:text="@string/event_form_end"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
-                <EditText
-                    android:id="@+id/endInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    >End Time</EditText>
-
-                <TextView
-                    android:id="@+id/deetsText2"
+                <TimePicker
+                    android:id="@+id/end_time_picker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="3dp"
-                    android:text="@string/event_form_details"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <EditText
-                    android:id="@+id/deetsInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="20dp"
-                    android:hint="Free ice cream!"
-                    />
+                    android:timePickerMode="spinner"/>
 
         </LinearLayout>
 

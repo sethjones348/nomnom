@@ -25,12 +25,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
+import java.util.ArrayList;
+
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener {
 
     private static final String TAG = " ";
 
@@ -41,6 +44,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean addEvent;
 
     private LatLng addEventLocation;
+
+    private ArrayList<Event> eventList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,26 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         addEvent = false;
 
         addEventLocation = null;
+
+        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
+
+        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
+
+        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
+
+        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm");
+        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm");
+        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm");
+
+        event1.setEventId(0);
+        event2.setEventId(1);
+        event3.setEventId(2);
+
+        eventList.add(event1);
+        eventList.add(event2);
+        eventList.add(event3);
+
+
 
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
@@ -73,6 +98,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnMapClickListener(this);
+        mMap.setOnInfoWindowClickListener(this);
 
         try {
             boolean success = googleMap.setMapStyle(
@@ -93,7 +119,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         //zoom the map into campus upon opening
         mMap.moveCamera(CameraUpdateFactory.zoomTo(16.0f)); //Range of 2.0 to 21.0
         mMap.moveCamera(CameraUpdateFactory.newLatLng(campus));
-
 
         mFusedLocationProviderClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
@@ -118,6 +143,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        placeMarkers();
     }
 
     public static Intent createIntent(Context context) {
@@ -151,5 +177,18 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             Intent myIntent = AddEventActivity.createIntent(this.getApplicationContext(), addEventLocation);
             startActivity(myIntent);
         }
+    }
+
+    private void placeMarkers(){
+        for(final Event e: eventList){
+            mMap.addMarker(new MarkerOptions().position(e.getLocation()).title(e.getTitle() + ": " + e.getFood())).setTag(e.getEventId());
+        }
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Intent intent = EventDetailsActivity.createIntent(this.getApplicationContext(), (int) marker.getTag());
+
+        startActivity(intent);
     }
 }
