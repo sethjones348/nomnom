@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "395662743324",
+    "firebase_url": "https://nom-nom-dc909.firebaseio.com",
+    "project_id": "nom-nom-dc909",
+    "storage_bucket": "nom-nom-dc909.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:395662743324:android:0b3379c8d26e8cfda1ccd9",
+        "android_client_info": {
+          "package_name": "edu.iastate.nomnom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "395662743324-nka3v87iqkgu3s8497lgfu18r3esbr3k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6FSQbs_hsYH8MxR4_i-tDTOD4eBTZfR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "395662743324-nka3v87iqkgu3s8497lgfu18r3esbr3k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
