@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Context;
@@ -30,10 +32,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-
+//import com.google.maps.GeoPoint;
 import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, Observer<ArrayList<Event>> {
 
     private static final String TAG = " ";
 
@@ -45,7 +47,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LatLng addEventLocation;
 
-    private ArrayList<Event> eventList = new ArrayList<>();
+    private EventList eventList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        eventList = new ViewModelProvider(this,
+                new ViewModelProvider.NewInstanceFactory()).get(EventList.class);
+
+        eventList.eventList.observe(this, this);
 
         addEvent = false;
 
@@ -75,11 +82,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         event2.setEventId(1);
         event3.setEventId(2);
 
-        eventList.add(event1);
-        eventList.add(event2);
-        eventList.add(event3);
-
-
+        eventList.addEvent(event1);
+        eventList.addEvent(event2);
+        eventList.addEvent(event3);
 
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
@@ -142,7 +147,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // Do nothing
             }
         });
-
         placeMarkers();
     }
 
@@ -180,7 +184,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void placeMarkers(){
-        for(final Event e: eventList){
+        for(final Event e: eventList.eventList.getValue()){
             mMap.addMarker(new MarkerOptions().position(e.getLocation()).title(e.getTitle() + ": " + e.getFood())).setTag(e.getEventId());
         }
     }
@@ -190,5 +194,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         Intent intent = EventDetailsActivity.createIntent(this.getApplicationContext(), (int) marker.getTag());
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onChanged(ArrayList<Event> events) {
     }
 }
