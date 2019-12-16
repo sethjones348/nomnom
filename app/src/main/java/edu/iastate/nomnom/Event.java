@@ -5,9 +5,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
 @Entity(tableName = "event")
 public class Event {
-//    @Entity(tableName = "event")
 
     @PrimaryKey()
     private String eventId;
@@ -32,7 +32,7 @@ public class Event {
 
     @Ignore
     public Event(String eventId, String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
-        this.eventId=eventId;
+        this.eventId = eventId;
         this.title = title;
         this.location = location;
         this.locationDetails = locationDetails;
@@ -96,5 +96,4 @@ public class Event {
     public void setFood(String details) {
         this.food = details;
     }
-
 }

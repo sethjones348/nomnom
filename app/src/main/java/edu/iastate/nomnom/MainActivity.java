@@ -1,16 +1,9 @@
 package edu.iastate.nomnom;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
@@ -20,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,12 +23,27 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 
 import java.util.ArrayList;
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, Observer<ArrayList<Event>> {
 
@@ -50,10 +59,27 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EventList eventList;
 
+    private final FirebaseApp fbApp = FirebaseApp.getInstance("https://nom-nom-dc909.firebaseio.com/events/event");
+
+    private final FirebaseFirestore fb = FirebaseFirestore.getInstance(fbApp);
+
+    final String PREFS_NAME = "appPrefs";
+
+    private EventDao db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        if (settings.getBoolean("first_open", true)) {
+
+            updateSQL(firebasePull());
+
+            settings.edit().putBoolean("first_open", false).apply();
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -68,6 +94,24 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         addEvent = false;
 
         addEventLocation = null;
+
+        final DocumentReference docRef = fb.collection("cities").document("SF");
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Data retrieval failed", e);
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    // TODO handle updated data
+                } else {
+                    Log.d(TAG, "No data");
+                }
+            }
+        });
 
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
@@ -135,26 +179,27 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         update the eventList object here
         and then delete the test cases when you are done
          */
+        //eventsRef.
 
         ArrayList<Event> events = new ArrayList<>();
-
-        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
-
-        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
-
-        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
-
-        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-
-        event1.setEventId(0);
-        event2.setEventId(1);
-        event3.setEventId(2);
-
-        events.add(event1);
-        events.add(event2);
-        events.add(event3);
+//
+//        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
+//
+//        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
+//
+//        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
+//
+//        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+//        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+//        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+//
+//        event1.setEventId(0);
+//        event2.setEventId(1);
+//        event3.setEventId(2);
+//
+//        events.add(event1);
+//        events.add(event2);
+//        events.add(event3);
 
         eventList.eventList.setValue(events);
     }
@@ -210,5 +255,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         if(mMap != null) {
             placeMarkers();
         }
+    }
+
+    private void updateSQL(ArrayList<Event> events) {
+        //TODO put new events in SQLite
+    }
+
+    private ArrayList<Event> firebasePull() {
+        //TODO pull data from firebase
+        return null;
     }
 }
