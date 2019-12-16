@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Context;
@@ -30,10 +32,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener {
+public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, Observer<ArrayList<Event>> {
 
     private static final String TAG = " ";
 
@@ -45,7 +49,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private LatLng addEventLocation;
 
-    private ArrayList<Event> eventList = new ArrayList<>();
+    private EventList eventList;
+
+    private final FirebaseDatabase fb = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,29 +63,16 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        eventList = new ViewModelProvider(this,
+                new ViewModelProvider.NewInstanceFactory()).get(EventList.class);
+
+        eventList.eventList.observe(this, this);
+
         addEvent = false;
 
         addEventLocation = null;
 
-        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
-
-        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
-
-        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
-
-        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-
-        event1.setEventId(0);
-        event2.setEventId(1);
-        event3.setEventId(2);
-
-        eventList.add(event1);
-        eventList.add(event2);
-        eventList.add(event3);
-
-
+        DatabaseReference ref = fb.getReference("nom-nom-dc909/events");
 
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
@@ -143,7 +136,32 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        placeMarkers();
+        /* ToDo FireBaseStuff - Zach attack
+        update the eventList object here
+        and then delete the test cases when you are done
+         */
+
+        ArrayList<Event> events = new ArrayList<>();
+
+        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
+
+        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
+
+        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
+
+        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+
+        event1.setEventId(0);
+        event2.setEventId(1);
+        event3.setEventId(2);
+
+        events.add(event1);
+        events.add(event2);
+        events.add(event3);
+
+        eventList.eventList.setValue(events);
     }
 
     public static Intent createIntent(Context context) {
@@ -180,7 +198,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void placeMarkers(){
-        for(final Event e: eventList){
+        for(final Event e: eventList.eventList.getValue()){
             mMap.addMarker(new MarkerOptions().position(e.getLocation()).title(e.getTitle() + ": " + e.getFood())).setTag(e.getEventId());
         }
     }
@@ -190,5 +208,21 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         Intent intent = EventDetailsActivity.createIntent(this.getApplicationContext(), (int) marker.getTag());
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onChanged(ArrayList<Event> events) {
+        if(mMap != null) {
+            placeMarkers();
+        }
+    }
+
+    private void updateSQL(ArrayList<Event> events) {
+        //TODO put new events in SQLite
+    }
+
+    private ArrayList<Event> firebasePull() {
+        //TODO firebase
+        return null;
     }
 }

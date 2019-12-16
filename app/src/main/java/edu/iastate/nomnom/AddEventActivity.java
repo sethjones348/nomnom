@@ -2,9 +2,13 @@ package edu.iastate.nomnom;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.view.View;
-
+import android.widget.ImageView;
+import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -12,13 +16,23 @@ import com.google.android.gms.maps.model.LatLng;
 public class AddEventActivity extends AppCompatActivity {
 
     private LatLng eventLocation;
+    private ImageView img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
 
+        img=(ImageView)findViewById(R.id.photoPreview);
+        Button b = (Button)findViewById(R.id.photoButton);
 
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent,0);
+            }
+        });
         eventLocation = new LatLng(getIntent().getDoubleExtra("eventLatitude", 0.0),
                                    getIntent().getDoubleExtra("eventLongitude", 0.0));
     }
@@ -36,6 +50,13 @@ public class AddEventActivity extends AppCompatActivity {
     public void onClickAdd(View view) {
         Intent main = MainActivity.createIntent(this);
         startActivity(main);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        super.onActivityResult(requestCode,resultCode,intent);
+        Bitmap bit = (Bitmap)intent.getExtras().get("data");
+        img.setImageBitmap(bit);
     }
 
 }
