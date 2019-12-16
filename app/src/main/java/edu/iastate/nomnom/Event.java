@@ -1,30 +1,38 @@
 package edu.iastate.nomnom;
 
-import android.net.Uri;
-
 import com.google.android.gms.maps.model.LatLng;
-//import androidx.room.ColumnInfo;
-//import androidx.room.Entity;
-//import androidx.room.PrimaryKey;
-
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+@Entity(tableName = "event")
 public class Event {
 //    @Entity(tableName = "event")
-    private int eventId;
 
+    @PrimaryKey()
+    private String eventId;
+
+    @ColumnInfo(name = "title")
     private String title;
 
+    @ColumnInfo(name = "food")
     private String food;
 
+    @ColumnInfo(name = "locationDetails")
     private String locationDetails;
 
+    @ColumnInfo(name = "startTime")
     private String startTime;
 
+    @ColumnInfo(name = "endTime")
     private String endTime;
 
+    @ColumnInfo(name = "location")
     private LatLng location;
 
-
-    public Event(String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
+    @Ignore
+    public Event(String eventId, String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
+        this.eventId=eventId;
         this.title = title;
         this.location = location;
         this.locationDetails = locationDetails;
@@ -33,11 +41,11 @@ public class Event {
         this.food = food;
     }
 
-    public int getEventId() {
+    public String getEventId() {
         return eventId;
     }
 
-    public void setEventId(int eventId) {
+    public void setEventId(String eventId) {
         this.eventId = eventId;
     }
 
