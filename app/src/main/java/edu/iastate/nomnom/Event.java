@@ -1,7 +1,5 @@
 package edu.iastate.nomnom;
 
-import android.net.Uri;
-
 import com.google.android.gms.maps.model.LatLng;
 
 //import androidx.room.ColumnInfo;
@@ -12,7 +10,7 @@ import com.google.firebase.database.DatabaseReference;
 //    @Entity(tableName = "event")
 public class Event {
 
-    private int eventId;
+    private int eventID;
 
     private String title;
 
@@ -39,11 +37,11 @@ public class Event {
     }
 
     public int getEventId() {
-        return eventId;
+        return eventID;
     }
 
     public void setEventId(int eventId) {
-        this.eventId = eventId;
+        this.eventID = eventId;
     }
 
     public String getTitle() {

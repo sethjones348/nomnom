@@ -32,7 +32,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-//import com.google.maps.GeoPoint;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, Observer<ArrayList<Event>> {
@@ -48,6 +50,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng addEventLocation;
 
     private EventList eventList;
+
+    private final FirebaseDatabase fb = FirebaseDatabase.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +71,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         addEvent = false;
 
         addEventLocation = null;
+
+        DatabaseReference ref = fb.getReference("nom-nom-dc909/events");
 
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
@@ -143,9 +149,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
 
-        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm");
-        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm");
+        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
+        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
 
         event1.setEventId(0);
         event2.setEventId(1);
@@ -209,5 +215,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         if(mMap != null) {
             placeMarkers();
         }
+    }
+
+    private void updateSQL(ArrayList<Event> events) {
+        //TODO put new events in SQLite
+    }
+
+    private ArrayList<Event> firebasePull() {
+        //TODO firebase
+        return null;
     }
 }
