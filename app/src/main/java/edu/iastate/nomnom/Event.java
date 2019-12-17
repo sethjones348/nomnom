@@ -1,6 +1,8 @@
 package edu.iastate.nomnom;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -9,6 +11,7 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "event")
 public class Event {
 
+    @NonNull
     @PrimaryKey()
     private String eventId;
 
@@ -27,18 +30,26 @@ public class Event {
     @ColumnInfo(name = "endTime")
     private String endTime;
 
-    @ColumnInfo(name = "location")
-    private LatLng location;
+    @ColumnInfo(name = "lat")
+    private double latitude;
+
+    @ColumnInfo(name = "long")
+    private double longitude;
 
     @Ignore
-    public Event(String eventId, String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
-        this.eventId = eventId;
+    public Event(String eventID, String title, String food, double latitude, double longitude, String locationDetails, String startTime, String endTime) {
+        this.eventId = eventID;
         this.title = title;
-        this.location = location;
+        this.latitude= latitude;
+        this.longitude = longitude;
         this.locationDetails = locationDetails;
         this.startTime = startTime;
         this.endTime = endTime;
         this.food = food;
+    }
+
+    public Event() {
+
     }
 
     public String getEventId() {
@@ -57,12 +68,20 @@ public class Event {
         this.title = title;
     }
 
-    public LatLng getLocation(){
-        return location;
+    public double getLatitude(){
+        return latitude;
     }
 
-    public void setLocation(LatLng location){
-        this.location = location;
+    public void setLatitude(double latitude){
+        this.latitude = latitude;
+    }
+
+    public double getLongitude(){
+        return longitude;
+    }
+
+    public void setLongitude(double longitude){
+        this.longitude = longitude;
     }
 
     public String getLocationDetails() {
@@ -95,5 +114,19 @@ public class Event {
 
     public void setFood(String details) {
         this.food = details;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventId='" + eventId + '\'' +
+                ", title='" + title + '\'' +
+                ", food='" + food + '\'' +
+                ", locationDetails='" + locationDetails + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
     }
 }

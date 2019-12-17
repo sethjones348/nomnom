@@ -33,7 +33,7 @@ public class EventDetailsActivity extends AppCompatActivity {
         TextView startTime = findViewById(R.id.startOutput);
         TextView endTime = findViewById(R.id.endOutput);
 
-        //Uncomment below once the psuedo code above is finished and this.event is initalized
+        //Uncomment below once the pseudo code above is finished and this.event is initialized
 //        title.setText(event.getTitle());
 //        food.setText(event.getFood());
 //        locationDetails.setText(event.getLocationDetails());
@@ -41,7 +41,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 //        endTime.setText(event.getEndTime());
     }
 
-    public static Intent createIntent(Context context, int eventId) {
+    public static Intent createIntent(Context context, String eventId) {
         Intent intent = new Intent(context, EventDetailsActivity.class);
 
         intent.putExtra("eventId", eventId);

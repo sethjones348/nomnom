@@ -23,18 +23,24 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.annotations.Nullable;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,20 +65,50 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EventList eventList;
 
-    private final FirebaseApp fbApp = FirebaseApp.getInstance("https://nom-nom-dc909.firebaseio.com/events/event");
+    private final FirebaseApp fbApp = FirebaseApp.initializeApp(this);
 
     private final FirebaseFirestore fb = FirebaseFirestore.getInstance(fbApp);
 
     final String PREFS_NAME = "appPrefs";
 
-    private EventDao db;
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setFirebaseChangeListener();
+
+        db = AppDatabase.getAppDatabase(this);
+
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+
+        Intent intent = getIntent();
+
+        if (intent != null) {
+            if (intent.getBooleanExtra("data_change", false)) {
+                //TODO add the new or updated event
+                String title = intent.getStringExtra("title");
+                String food = intent.getStringExtra("food");
+                String deets = intent.getStringExtra("locationDetails");
+                String startTime = intent.getStringExtra("startTime");
+                String endTime = intent.getStringExtra("endTime");
+                double latitude = intent.getDoubleExtra("lat", 0);
+                double longitude = intent.getDoubleExtra("long", 0);
+
+                //TODO push to firebase and get firebaseID (I think the code below does this properly)
+
+                DocumentReference newEventRef = fb.collection("events").document();
+                String firebaseID = newEventRef.getId();
+
+                final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
+                Toast.makeText(this, "ID " + firebaseID, Toast.LENGTH_SHORT).show();
+
+                newEventRef.set(newEvent);
+                System.out.println("Data pushed");
+            }
+        }
 
         if (settings.getBoolean("first_open", true)) {
 
@@ -94,24 +130,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         addEvent = false;
 
         addEventLocation = null;
-
-        final DocumentReference docRef = fb.collection("cities").document("SF");
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Data retrieval failed", e);
-                    return;
-                }
-
-                if (snapshot != null && snapshot.exists()) {
-                    // TODO handle updated data
-                } else {
-                    Log.d(TAG, "No data");
-                }
-            }
-        });
 
         findViewById(R.id.cancel).setVisibility(View.GONE);
 
@@ -182,24 +200,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         //eventsRef.
 
         ArrayList<Event> events = new ArrayList<>();
-//
-//        LatLng event1Loc = new LatLng(42.0271229, -93.6428123);
-//
-//        LatLng event2Loc = new LatLng(42.0254624, -93.6497928);
-//
-//        LatLng event3Loc = new LatLng(42.0293523, -93.6497287);
-//
-//        Event event1 = new Event("Homecoming Week", "Chic fil a", event1Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
-//        Event event2 = new Event("senior Week","Chic fil a", event2Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
-//        Event event3 = new Event("yeee Week","Chic fil a", event3Loc,"Outside of the library", "10:00 am", "12:00 pmm", null);
-//
-//        event1.setEventId(0);
-//        event2.setEventId(1);
-//        event3.setEventId(2);
-//
-//        events.add(event1);
-//        events.add(event2);
-//        events.add(event3);
 
         eventList.eventList.setValue(events);
     }
@@ -233,19 +233,25 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             addEvent = false;
 
             Intent myIntent = AddEventActivity.createIntent(this.getApplicationContext(), addEventLocation);
+            myIntent.putExtra("eventLatitude", addEventLocation.latitude);
+            myIntent.putExtra("eventLongitude", addEventLocation.longitude);
+
             startActivity(myIntent);
         }
     }
 
     private void placeMarkers(){
         for(final Event e: eventList.eventList.getValue()){
-            mMap.addMarker(new MarkerOptions().position(e.getLocation()).title(e.getTitle() + ": " + e.getFood())).setTag(e.getEventId());
+            double latitude = e.getLatitude();
+            double longitude = e.getLongitude();
+            LatLng location = new LatLng(latitude, longitude);
+            mMap.addMarker(new MarkerOptions().position(location).title(e.getTitle() + ": " + e.getFood())).setTag(e.getEventId());
         }
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Intent intent = EventDetailsActivity.createIntent(this.getApplicationContext(), (int) marker.getTag());
+        Intent intent = EventDetailsActivity.createIntent(this.getApplicationContext(), (String) marker.getTag());
 
         startActivity(intent);
     }
@@ -263,6 +269,70 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ArrayList<Event> firebasePull() {
         //TODO pull data from firebase
+
         return null;
+    }
+
+    private void setFirebaseChangeListener() {
+        //Everything except the stuff inside the case statements was taken from firebase documentation, so it is probably good.
+        //The problem is that the changes seem to be empty
+        fb.collection("events")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshots,
+                                        @Nullable FirebaseFirestoreException e) {
+                        System.out.println("onEvent called");
+                        if (e != null) {
+                            Log.w(TAG, "Data retrieval failed", e);
+                            return;
+                        }
+
+                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            switch (dc.getType()) {
+                                case ADDED:
+                                    //TODO add new event to SQLite
+                                    System.out.println("Case statement: ");
+                                    System.out.println(dc.getDocument().getData());
+                                    String title = (String) dc.getDocument().get("title");
+                                    String food = (String) dc.getDocument().get("food");
+                                    String deets = (String) dc.getDocument().get("locationDetails");
+                                    String startTime = (String) dc.getDocument().get("startTime");
+                                    String endTime = (String) dc.getDocument().get("endTime");
+                                    double latitude = (double) dc.getDocument().get("latitude");
+                                    double longitude = (double) dc.getDocument().get("longitude");
+
+                                    double newLatitude = 0;
+                                    double newLongitude = 0;
+
+
+                                    String firebaseID = dc.getDocument().getId();
+                                    //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
+
+                                    Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
+
+                                    System.out.println("Event for live data: " + newEvent.toString());
+
+                                    ArrayList<Event> newEventList = eventList.eventList.getValue();
+
+                                    if (newEventList != null) {
+                                        Toast.makeText(getApplicationContext(), "LatitudeFB " + newEvent.getLatitude(), Toast.LENGTH_SHORT).show();
+                                        newEventList.add(newEvent);
+                                    }
+
+                                    //TODO don't do this in the final version, just for testing
+                                    eventList.eventList.setValue(newEventList);
+
+                                    break;
+                                case MODIFIED:
+                                    //TODO update event in SQLite
+                                    break;
+                                case REMOVED:
+                                    //TODO remove event from SQLite
+                                    break;
+                            }
+                        }
+
+                    }
+                });
     }
 }
