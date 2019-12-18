@@ -7,8 +7,12 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Button;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -17,11 +21,14 @@ public class AddEventActivity extends AppCompatActivity {
 
     private LatLng eventLocation;
     private ImageView img;
+    private AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
+
+        db = AppDatabase.getAppDatabase(this);
 
         img=(ImageView)findViewById(R.id.photoPreview);
         Button b = (Button)findViewById(R.id.photoButton);
@@ -49,6 +56,29 @@ public class AddEventActivity extends AppCompatActivity {
 
     public void onClickAdd(View view) {
         Intent main = MainActivity.createIntent(this);
+
+        EditText titleInput = findViewById(R.id.titleInput);
+        EditText deetsInput = findViewById(R.id.deetsInput);
+        EditText locationInput = findViewById(R.id.locationInput);
+        TimePicker startTimeInput = findViewById(R.id.start_time_picker);
+        TimePicker endTimeInput = findViewById(R.id.end_time_picker);
+
+        String title = titleInput.getText().toString();
+        String deets = deetsInput.getText().toString();
+        String location = locationInput.getText().toString();
+        String startTime = startTimeInput.getCurrentHour() + ":" + startTimeInput.getCurrentMinute();
+        String endTime = endTimeInput.getCurrentHour() + ":" + endTimeInput.getCurrentMinute();
+        //TODO fix time format
+
+        main.putExtra("title", title);
+        main.putExtra("food", deets);
+        main.putExtra("locationDetails", location);
+        main.putExtra("startTime", startTime);
+        main.putExtra("endTime", endTime);
+        main.putExtra("lat", eventLocation.latitude);
+        main.putExtra("long", eventLocation.longitude);
+        main.putExtra("data_change", true);
+
         startActivity(main);
     }
 
