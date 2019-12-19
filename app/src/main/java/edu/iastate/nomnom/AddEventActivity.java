@@ -36,6 +36,11 @@ public class AddEventActivity extends AppCompatActivity {
     private byte[] byteArray;
     private String eventID;
     private boolean isEdit;
+    EditText titleInput ;
+    EditText deetsInput ;
+    EditText locationInput ;
+    TimePicker startTimeInput;
+    TimePicker endTimeInput;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -47,6 +52,11 @@ public class AddEventActivity extends AppCompatActivity {
 
         img=(ImageView)findViewById(R.id.photoPreview);
         Button b = (Button)findViewById(R.id.photoButton);
+        titleInput = findViewById(R.id.titleInput);
+        deetsInput = findViewById(R.id.deetsInput);
+        locationInput = findViewById(R.id.locationInput);
+        startTimeInput = findViewById(R.id.start_time_picker);
+        endTimeInput = findViewById(R.id.end_time_picker);
 
         b.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,11 +73,6 @@ public class AddEventActivity extends AppCompatActivity {
             Event event = db.eventDao().findByID(eventID);
             latitude = event.getLatitude();
             longitude = event.getLongitude();
-            EditText titleInput = findViewById(R.id.titleInput);
-            EditText deetsInput = findViewById(R.id.deetsInput);
-            EditText locationInput = findViewById(R.id.locationInput);
-            TimePicker startTimeInput = findViewById(R.id.start_time_picker);
-            TimePicker endTimeInput = findViewById(R.id.end_time_picker);
 
             byteArray=intent.getByteArrayExtra("imageToEdit");
             //img.setImageBitmap(even);
@@ -126,12 +131,6 @@ public class AddEventActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickAdd(View view) {
         Intent main = MainActivity.createIntent(this);
-
-        EditText titleInput = findViewById(R.id.titleInput);
-        EditText deetsInput = findViewById(R.id.deetsInput);
-        EditText locationInput = findViewById(R.id.locationInput);
-        TimePicker startTimeInput = findViewById(R.id.start_time_picker);
-        TimePicker endTimeInput = findViewById(R.id.end_time_picker);
 
         String title = titleInput.getText().toString();
         String deets = deetsInput.getText().toString();
