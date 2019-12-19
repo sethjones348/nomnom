@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import java.util.Calendar;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -39,14 +38,13 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 
 import java.lang.reflect.Array;
-import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -74,6 +72,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private final FirebaseFirestore fb = FirebaseFirestore.getInstance(fbApp);
 
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+
     final String PREFS_NAME = "appPrefs";
 
     private AppDatabase db;
@@ -89,8 +89,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
-        removeOutdated();
-        
         Intent intent = getIntent();
 
         if (intent != null) {
@@ -107,16 +105,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
                 byte[] byteArray = intent.getByteArrayExtra("photo");
+
+                StorageReference imageRef = uploadImage(firebaseID, byteArray);
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
-                final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
+                final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imageRef.toString());
                 Toast.makeText(this, "ID " + firebaseID, Toast.LENGTH_SHORT).show();
 
                 newEventRef.set(newEvent);
                 System.out.println("Data pushed");
 
                 //add to SQLite database
-                db.eventDao().insertEvent(newEvent);
+                if (getIntent().getBooleanExtra("isEdit", false)) {
+                    db.eventDao().update(newEvent);
+                }
+                else {
+                    db.eventDao().insertEvent(newEvent);
+                }
             }
             if(intent.getStringExtra("deletedEvent") != null){
                 String deletedEventId = intent.getStringExtra("deletedEvent");
@@ -212,7 +217,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        placeMarkers();
+        refresh();
+    }
+
+    private void refresh(){
+        eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
     }
 
     public static Intent createIntent(Context context) {
@@ -282,30 +291,50 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateSQL(ArrayList<Event> events) {
         //TODO put new events in SQLite
+        for (Event e : events) {
+            if (sqlVersionExists(e.getEventId())) {
+                db.eventDao().update(e);
+            }
+            else {
+                db.eventDao().insertEvent(e);
+            }
+        }
+        for (Event e : db.eventDao().getAll()) {
+            if (!events.contains(e)) {
+                db.eventDao().delete(e);
+            }
+        }
     }
 
     private ArrayList<Event> firebasePull() {
-        //TODO pull data from firebase
-
-        return null;
+        final ArrayList<Event> events = new ArrayList<>();
+        fb.collection("some collection").get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot documentSnapshots) {
+                        if (documentSnapshots.isEmpty()) {
+                            Log.d(TAG, "onSuccess: LIST EMPTY");
+                            return;
+                        } else {
+                            // Convert the whole Query Snapshot to a list
+                            // of objects directly! No need to fetch each
+                            // document.
+                            List<Event> types = documentSnapshots.toObjects(Event.class);
+                            // Add all to your list
+                            events.addAll(types);
+                            Log.d(TAG, "onSuccess: " + events);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "Error getting data!!!", Toast.LENGTH_LONG).show();
+                    }
+                });
+        return events;
     }
 
-    private void removeOutdated(){
-        Date currentTime = Calendar.getInstance().getTime();
-        for(Event e:eventList.getEventList().getValue()){
-            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
-            try {
-                Date endD=sdf.parse(e.getEndTime());
-                if(endD.getTime()<currentTime.getTime()){
-                    DocumentReference deleteRef = fb.collection("events").document(e.getEventId());
-                    deleteRef.delete();
-                }
-            } catch (ParseException ex) {
-                ex.printStackTrace();
-            }
-
-        }
-    }
     private void setFirebaseChangeListener() {
         //Everything except the stuff inside the case statements was taken from firebase documentation, so it is probably good.
         //The problem is that the changes seem to be empty
@@ -330,40 +359,27 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                             String endTime = (String) dc.getDocument().get("endTime");
                             double latitude = (double) dc.getDocument().get("latitude");
                             double longitude = (double) dc.getDocument().get("longitude");
-
-                            double newLatitude = 0;
-                            double newLongitude = 0;
-
+                            String imgRef = (String) dc.getDocument().get("imgRef");
 
                             String firebaseID = dc.getDocument().getId();
                             //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
 
-                            Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
+                            Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imgRef);
 
                             System.out.println("Event for live data: " + newEvent.toString());
-
 
                             switch (dc.getType()) {
                                 case ADDED:
                                     //eventList.eventList.getValue() will never be null
                                     //ArrayList<Event> newEventList = eventList.eventList.getValue();
-
-                                    Toast.makeText(getApplicationContext(), "LatitudeFB " + newEvent.getLatitude(), Toast.LENGTH_SHORT).show();
-//                                    eventList.addEvent(newEvent);
-
                                     if(!sqlVersionExists(newEvent.getEventId()))
                                         db.eventDao().insertEvent(newEvent);
-
                                     break;
                                 case MODIFIED:
-                                    if(!sqlVersionExists(newEvent.getEventId()))
-                                        db.eventDao().update(newEvent);
-                                    //eventList.addEvent(newEvent);
+                                    db.eventDao().update(newEvent);
                                     break;
                                 case REMOVED:
-//                                    eventList.deleteEvent(newEvent);
-                                    if(!sqlVersionExists(newEvent.getEventId()))
-                                        db.eventDao().delete(newEvent);
+                                    db.eventDao().delete(newEvent);
                                     break;
                             }
                         }
@@ -372,10 +388,30 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 });
     }
 
-    private boolean sqlVersionExists(String id){
+    private boolean sqlVersionExists(String id) {
         return db.eventDao().findByID(id) != null;
     }
 
+    private StorageReference uploadImage(String filename, byte[] bytes) {
+        StorageReference storageRef = storage.getReference();
+        StorageReference imageRef = storageRef.child("images/" + filename);
+        UploadTask uploadTask = imageRef.putBytes(bytes);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                // ...
+            }
+        });
+        return imageRef;
+    }
 
-
+    public void onRefreshClicked(View view) {
+        refresh();
+    }
 }

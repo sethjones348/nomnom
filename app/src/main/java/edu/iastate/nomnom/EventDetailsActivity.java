@@ -55,6 +55,7 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     public void editEvent(View view){
         Intent intent = AddEventActivity.createIntent(this,event.getEventId());
+        intent.putExtra("isEdit", true);
         startActivity(intent);
     }
 }

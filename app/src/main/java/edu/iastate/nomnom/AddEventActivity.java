@@ -117,8 +117,8 @@ public class AddEventActivity extends AppCompatActivity {
         String title = titleInput.getText().toString();
         String deets = deetsInput.getText().toString();
         String location = locationInput.getText().toString();
-       // String startTime = startTimeInput.getCurrentHour() + ":" + startTimeInput.getCurrentMinute();
-       // String endTime = endTimeInput.getCurrentHour() + ":" + endTimeInput.getCurrentMinute();
+        // String startTime = startTimeInput.getCurrentHour() + ":" + startTimeInput.getCurrentMinute();
+        // String endTime = endTimeInput.getCurrentHour() + ":" + endTimeInput.getCurrentMinute();
         //TODO fix time format
         String strStart = formatTime(startTimeInput.getHour(),startTimeInput.getMinute());
         String strEnd = formatTime(endTimeInput.getHour(),endTimeInput.getMinute());
@@ -127,15 +127,11 @@ public class AddEventActivity extends AppCompatActivity {
         main.putExtra("locationDetails", location);
         main.putExtra("startTime", strStart);
         main.putExtra("endTime", strEnd);
-        main.putExtra("latitude", eventLocation.latitude);
-        main.putExtra("longitude", eventLocation.longitude);
+        main.putExtra("lat", eventLocation.latitude);
+        main.putExtra("long", eventLocation.longitude);
         main.putExtra("data_change", true);
         main.putExtra("photo",byteArray);
         startActivity(main);
-
-
-
-
     }
 
     @Override
