@@ -34,6 +34,11 @@ public class AddEventActivity extends AppCompatActivity {
     private AppDatabase db;
     private byte[] byteArray;
     private String eventID;
+    EditText titleInput ;
+    EditText deetsInput ;
+    EditText locationInput ;
+    TimePicker startTimeInput;
+    TimePicker endTimeInput;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -45,6 +50,11 @@ public class AddEventActivity extends AppCompatActivity {
 
         img=(ImageView)findViewById(R.id.photoPreview);
         Button b = (Button)findViewById(R.id.photoButton);
+        titleInput = findViewById(R.id.titleInput);
+        deetsInput = findViewById(R.id.deetsInput);
+        locationInput = findViewById(R.id.locationInput);
+        startTimeInput = findViewById(R.id.start_time_picker);
+        endTimeInput = findViewById(R.id.end_time_picker);
 
         b.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,11 +68,7 @@ public class AddEventActivity extends AppCompatActivity {
         if(intent.getStringExtra("editedEvent") != null) {
             eventID=intent.getStringExtra("editedEvent");
             Event event = db.eventDao().findByID(eventID);
-            EditText titleInput = findViewById(R.id.titleInput);
-            EditText deetsInput = findViewById(R.id.deetsInput);
-            EditText locationInput = findViewById(R.id.locationInput);
-            TimePicker startTimeInput = findViewById(R.id.start_time_picker);
-            TimePicker endTimeInput = findViewById(R.id.end_time_picker);
+
 
             byteArray=intent.getByteArrayExtra("imageToEdit");
             //img.setImageBitmap(even);
@@ -73,11 +79,22 @@ public class AddEventActivity extends AppCompatActivity {
 
 
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
+            Date currentTime = Calendar.getInstance().getTime();
             Date startD=new Date();
             Date endD=new Date();
+            startD.setTime(currentTime.getTime());
+            endD.setTime(currentTime.getTime());
             try {
-                startD = sdf.parse(startTimeInput.toString());
-                endD = sdf.parse(endTimeInput.toString());
+                startD = sdf.parse(event.getStartTime());
+                endD = sdf.parse(event.getEndTime());
+
+                startD.setMonth(currentTime.getMonth());
+                startD.setDate(currentTime.getDate());
+                startD.setYear(currentTime.getYear());
+
+                endD.setMonth(currentTime.getMonth());
+                endD.setDate(currentTime.getDate());
+                endD.setYear(currentTime.getYear());
 
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -113,12 +130,6 @@ public class AddEventActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickAdd(View view) {
         Intent main = MainActivity.createIntent(this);
-
-        EditText titleInput = findViewById(R.id.titleInput);
-        EditText deetsInput = findViewById(R.id.deetsInput);
-        EditText locationInput = findViewById(R.id.locationInput);
-        TimePicker startTimeInput = findViewById(R.id.start_time_picker);
-        TimePicker endTimeInput = findViewById(R.id.end_time_picker);
 
         String title = titleInput.getText().toString();
         String deets = deetsInput.getText().toString();
