@@ -89,6 +89,13 @@
         android:layout_marginBottom="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <ImageView
+        android:id="@+id/imagePreview"
+        android:layout_width="216dp"
+        android:layout_height="181dp"
+
+        />
+
     <Button
         android:id="@+id/editEvent"
         android:layout_width="132dp"
