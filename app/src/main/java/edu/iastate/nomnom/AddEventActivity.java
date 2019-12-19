@@ -112,7 +112,7 @@ public class AddEventActivity extends AppCompatActivity {
 
 
 
-        }else{
+        }else {
             latitude = intent.getDoubleExtra("eventLatitude", 0.0);
             longitude = intent.getDoubleExtra("eventLongitude", 0.0);
         }

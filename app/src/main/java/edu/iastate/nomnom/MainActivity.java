@@ -230,8 +230,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void refresh(){
         removeOutdated();
+        
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
-        placeMarkers();
+//        placeMarkers();
     }
 
     public static Intent createIntent(Context context) {
@@ -343,7 +344,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         db.eventDao().delete(e);
                     }
                 }
-                Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
                 refresh();
 
             }
