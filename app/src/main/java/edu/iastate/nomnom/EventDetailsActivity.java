@@ -52,4 +52,9 @@ public class EventDetailsActivity extends AppCompatActivity {
         Intent intent = MainActivity.createIntent(this, event.getEventId());
         startActivity(intent);
     }
+
+    public void editEvent(View view){
+        Intent intent = AddEventActivity.createIntent(this,event.getEventId());
+        startActivity(intent);
+    }
 }
