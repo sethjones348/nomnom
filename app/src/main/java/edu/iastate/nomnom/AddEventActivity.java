@@ -151,7 +151,7 @@ public class AddEventActivity extends AppCompatActivity {
     }
 
     public static Intent createIntent(Context context,String eventId) {
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, AddEventActivity.class);
         intent.putExtra("editedEvent", eventId);
         return intent;
     }

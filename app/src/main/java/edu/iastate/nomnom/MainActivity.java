@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import java.util.Calendar;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,7 +42,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.lang.reflect.Array;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -84,6 +89,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
+        removeOutdated();
+        
         Intent intent = getIntent();
 
         if (intent != null) {
@@ -283,6 +290,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         return null;
     }
 
+    private void removeOutdated(){
+        Date currentTime = Calendar.getInstance().getTime();
+        for(Event e:eventList.getEventList().getValue()){
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
+            try {
+                Date endD=sdf.parse(e.getEndTime());
+                if(endD.getTime()<currentTime.getTime()){
+                    DocumentReference deleteRef = fb.collection("events").document(e.getEventId());
+                    deleteRef.delete();
+                }
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+            }
+
+        }
+    }
     private void setFirebaseChangeListener() {
         //Everything except the stuff inside the case statements was taken from firebase documentation, so it is probably good.
         //The problem is that the changes seem to be empty
@@ -352,5 +375,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean sqlVersionExists(String id){
         return db.eventDao().findByID(id) != null;
     }
+
+
 
 }
