@@ -17,6 +17,8 @@
     <string name="cancel_button">Cancel</string>
     <string name="addPhoto">Add Photo</string>
     <string name="photoPreview"></string>
+    <string name="editEvent">Edit event</string>
+    <string name="refresh_button">Refresh</string>
 
 
 </resources>

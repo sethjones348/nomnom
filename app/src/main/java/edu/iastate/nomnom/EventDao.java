@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -21,5 +22,8 @@ public interface EventDao {
 
     @Delete
     void delete(Event event);
+
+    @Update
+    void update(Event event);
 
 }

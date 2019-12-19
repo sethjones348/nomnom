@@ -3,6 +3,7 @@ package edu.iastate.nomnom;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,18 +13,18 @@ public class EventDetailsActivity extends AppCompatActivity {
 
     private Event event;
 
+    AppDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
 
-        int eventId = getIntent().getIntExtra("eventId", 0);
+        String eventId = getIntent().getStringExtra("eventId");
 
-        //Psuedo code for what this activity will need to do
-        /* ToDo Amith this is for you
-        this.event = Database(eventId)
-         */
-        //This toast is only here to test if the id was succesfully sent through the intent
+        database = AppDatabase.getAppDatabase(this);
+
+        event = database.eventDao().findByID(eventId);
 
         Toast.makeText(EventDetailsActivity.this, "eventId: " + eventId, Toast.LENGTH_LONG).show();
 
@@ -33,18 +34,28 @@ public class EventDetailsActivity extends AppCompatActivity {
         TextView startTime = findViewById(R.id.startOutput);
         TextView endTime = findViewById(R.id.endOutput);
 
-        //Uncomment below once the psuedo code above is finished and this.event is initalized
-//        title.setText(event.getTitle());
-//        food.setText(event.getFood());
-//        locationDetails.setText(event.getLocationDetails());
-//        startTime.setText(event.getStartTime());
-//        endTime.setText(event.getEndTime());
+        title.setText(event.getTitle());
+        food.setText(event.getFood());
+        locationDetails.setText(event.getLocationDetails());
+        startTime.setText(event.getStartTime());
+        endTime.setText(event.getEndTime());
     }
 
-    public static Intent createIntent(Context context, int eventId) {
+    public static Intent createIntent(Context context, String eventId) {
         Intent intent = new Intent(context, EventDetailsActivity.class);
 
         intent.putExtra("eventId", eventId);
         return intent;
+    }
+
+    public void deleteEvent(View view) {
+        Intent intent = MainActivity.createIntent(this, event.getEventId());
+        startActivity(intent);
+    }
+
+    public void editEvent(View view){
+        Intent intent = AddEventActivity.createIntent(this,event.getEventId());
+        intent.putExtra("isEdit", true);
+        startActivity(intent);
     }
 }

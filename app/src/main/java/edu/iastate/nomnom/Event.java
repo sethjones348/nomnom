@@ -1,14 +1,16 @@
 package edu.iastate.nomnom;
 
-import com.google.android.gms.maps.model.LatLng;
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Database;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
 @Entity(tableName = "event")
 public class Event {
-//    @Entity(tableName = "event")
 
+    @NonNull
     @PrimaryKey()
     private String eventId;
 
@@ -27,18 +29,30 @@ public class Event {
     @ColumnInfo(name = "endTime")
     private String endTime;
 
-    @ColumnInfo(name = "location")
-    private LatLng location;
+    @ColumnInfo(name = "lat")
+    private double latitude;
+
+    @ColumnInfo(name = "long")
+    private double longitude;
+
+    @ColumnInfo(name = "imgRef")
+    private String imgRef;
 
     @Ignore
-    public Event(String eventId, String title, String food, LatLng location, String locationDetails, String startTime, String endTime) {
-        this.eventId=eventId;
+    public Event(String eventID, String title, String food, double latitude, double longitude, String locationDetails, String startTime, String endTime, String imgRef) {
+        this.eventId = eventID;
         this.title = title;
-        this.location = location;
+        this.latitude= latitude;
+        this.longitude = longitude;
         this.locationDetails = locationDetails;
         this.startTime = startTime;
         this.endTime = endTime;
         this.food = food;
+        this.imgRef = imgRef;
+    }
+
+    public Event() {
+
     }
 
     public String getEventId() {
@@ -57,12 +71,20 @@ public class Event {
         this.title = title;
     }
 
-    public LatLng getLocation(){
-        return location;
+    public double getLatitude(){
+        return latitude;
     }
 
-    public void setLocation(LatLng location){
-        this.location = location;
+    public void setLatitude(double latitude){
+        this.latitude = latitude;
+    }
+
+    public double getLongitude(){
+        return longitude;
+    }
+
+    public void setLongitude(double longitude){
+        this.longitude = longitude;
     }
 
     public String getLocationDetails() {
@@ -97,4 +119,25 @@ public class Event {
         this.food = details;
     }
 
+    public String getImgRef() {
+        return imgRef;
+    }
+
+    public void setImgRef(String imgRef) {
+        this.imgRef = imgRef;
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "eventId='" + eventId + '\'' +
+                ", title='" + title + '\'' +
+                ", food='" + food + '\'' +
+                ", locationDetails='" + locationDetails + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }
