@@ -451,6 +451,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void onRefreshClicked(View view) {
-        refresh();
+        firebasePull();
     }
 }
