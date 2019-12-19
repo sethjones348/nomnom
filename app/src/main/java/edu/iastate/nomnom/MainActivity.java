@@ -55,7 +55,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.Calendar;
@@ -81,8 +80,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     FirebaseFirestore fb;
 
     FirebaseStorage storage;
-
-    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     final String PREFS_NAME = "appPrefs";
 
@@ -119,11 +116,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
                 byte[] byteArray = intent.getByteArrayExtra("photo");
-<<<<<<< app/src/main/java/edu/iastate/nomnom/MainActivity.java
                 Toast.makeText(MainActivity.this, "startD "+startTime+ " " + endTime, Toast.LENGTH_LONG).show();
-=======
-
->>>>>>> app/src/main/java/edu/iastate/nomnom/MainActivity.java
                 StorageReference imageRef = uploadImage(firebaseID, byteArray);
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
@@ -239,16 +232,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void refresh(){
         removeOutdated();
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
-<<<<<<< HEAD
-//        placeMarkers();
-=======
-<<<<<<< app/src/main/java/edu/iastate/nomnom/MainActivity.java
-        //placeMarkers();
-
-=======
         placeMarkers();
->>>>>>> app/src/main/java/edu/iastate/nomnom/MainActivity.java
->>>>>>> 19de19d60183278ca1f0863fff45e5470b8e4e85
     }
 
     public static Intent createIntent(Context context) {
@@ -357,32 +341,32 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void firebasePull() {
         fb.collection("events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    ArrayList<Event> tmp = new ArrayList<>();
+            ArrayList<Event> tmp = new ArrayList<>();
 
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Event e = document.toObject(Event.class);
-                                tmp.add(e);
-                                if (sqlVersionExists(e.getEventId())) {
-                                    db.eventDao().update(e);
-                                }
-                                else {
-                                    db.eventDao().insertEvent(e);
-                                }
-                            }
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Event e = document.toObject(Event.class);
+                        tmp.add(e);
+                        if (sqlVersionExists(e.getEventId())) {
+                            db.eventDao().update(e);
                         }
-                        for (Event e : db.eventDao().getAll()) {
-                            if (!fireBaseVersionExists(e.getEventId(), tmp)) {
-                                db.eventDao().delete(e);
-                            }
+                        else {
+                            db.eventDao().insertEvent(e);
                         }
-                        Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
-                        refresh();
-
                     }
-                });
+                }
+                for (Event e : db.eventDao().getAll()) {
+                    if (!fireBaseVersionExists(e.getEventId(), tmp)) {
+                        db.eventDao().delete(e);
+                    }
+                }
+                Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
+                refresh();
+
+            }
+        });
     }
     private void removeOutdated(){
         Date currentTime = Calendar.getInstance().getTime();
@@ -458,7 +442,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 //                             }
 //                         }
 
-//                     }
+    //                     }
 //                 });
     private boolean fireBaseVersionExists(String id, ArrayList<Event> fireBaseEvents){
         for(Event e : fireBaseEvents){
