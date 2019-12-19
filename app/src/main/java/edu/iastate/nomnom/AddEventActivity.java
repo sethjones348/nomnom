@@ -53,8 +53,9 @@ public class AddEventActivity extends AppCompatActivity {
             }
         });
 
-        if(getIntent().getStringExtra("editedEvent") != null) {
-            eventID=getIntent().getStringExtra("editedEvent");
+        Intent intent = getIntent();
+        if(intent.getStringExtra("editedEvent") != null) {
+            eventID=intent.getStringExtra("editedEvent");
             Event event = db.eventDao().findByID(eventID);
             EditText titleInput = findViewById(R.id.titleInput);
             EditText deetsInput = findViewById(R.id.deetsInput);
@@ -88,8 +89,8 @@ public class AddEventActivity extends AppCompatActivity {
 
 
         }else{
-            eventLocation = new LatLng(getIntent().getDoubleExtra("eventLatitude", 0.0),
-                    getIntent().getDoubleExtra("eventLongitude", 0.0));
+            eventLocation = new LatLng(intent.getDoubleExtra("eventLatitude", 0.0),
+                    intent.getDoubleExtra("eventLongitude", 0.0));
         }
     }
 
