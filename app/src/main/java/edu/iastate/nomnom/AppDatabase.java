@@ -19,10 +19,10 @@ public abstract class AppDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             INSTANCE =
                     Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "events.db")
-                            .addMigrations(MIGRATION_2_3)
-                            .allowMainThreadQueries()
-                            .build();
+                    AppDatabase.class, "events.db")
+                    .addMigrations(MIGRATION_2_3)
+                    .allowMainThreadQueries()
+                    .build();
         }
         return INSTANCE;
     }

@@ -40,6 +40,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -54,6 +55,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.Calendar;
@@ -61,6 +63,8 @@ import java.util.Calendar;
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, Observer<ArrayList<Event>> {
 
     private static final String TAG = " ";
+
+    private EventList tempEvents = new EventList();
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
@@ -72,9 +76,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EventList eventList;
 
-    private final FirebaseApp fbApp = FirebaseApp.initializeApp(this);
+    FirebaseApp fbApp;
 
-    private final FirebaseFirestore fb = FirebaseFirestore.getInstance(fbApp);
+    FirebaseFirestore fb;
+
+    FirebaseStorage storage;
 
     FirebaseStorage storage = FirebaseStorage.getInstance();
 
@@ -87,7 +93,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setFirebaseChangeListener();
+        fbApp = FirebaseApp.initializeApp(this);
+
+        fb = FirebaseFirestore.getInstance(fbApp);
+
+        storage = FirebaseStorage.getInstance();
 
         db = AppDatabase.getAppDatabase(this);
 
@@ -109,7 +119,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
                 byte[] byteArray = intent.getByteArrayExtra("photo");
+<<<<<<< app/src/main/java/edu/iastate/nomnom/MainActivity.java
                 Toast.makeText(MainActivity.this, "startD "+startTime+ " " + endTime, Toast.LENGTH_LONG).show();
+=======
+
+>>>>>>> app/src/main/java/edu/iastate/nomnom/MainActivity.java
                 StorageReference imageRef = uploadImage(firebaseID, byteArray);
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
@@ -134,14 +148,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 DocumentReference deleteRef = fb.collection("events").document(deletedEventId);
                 deleteRef.delete();
 
-                //db.eventDao().delete(deletedEvent);
+                db.eventDao().delete(deletedEvent);
             }
         }
 
         if (settings.getBoolean("first_open", true)) {
 
-            updateSQL(firebasePull());
-
+            updateSQL();
             settings.edit().putBoolean("first_open", false).apply();
         }
 
@@ -170,6 +183,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        firebasePull();
     }
 
     @Override
@@ -220,15 +234,17 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // Do nothing
             }
         });
-
-        refresh();
     }
 
     private void refresh(){
         removeOutdated();
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
+<<<<<<< app/src/main/java/edu/iastate/nomnom/MainActivity.java
         //placeMarkers();
 
+=======
+        placeMarkers();
+>>>>>>> app/src/main/java/edu/iastate/nomnom/MainActivity.java
     }
 
     public static Intent createIntent(Context context) {
@@ -317,9 +333,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void updateSQL(ArrayList<Event> events) {
-        //TODO put new events in SQLite
-        for (Event e : events) {
+    private void updateSQL() {
+        firebasePull();
+
+        for (Event e : tempEvents.eventList.getValue()) {
             if (sqlVersionExists(e.getEventId())) {
                 db.eventDao().update(e);
             }
@@ -328,41 +345,41 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
         for (Event e : db.eventDao().getAll()) {
-            if (!events.contains(e)) {
+            if (!tempEvents.eventList.getValue().contains(e)) {
                 db.eventDao().delete(e);
             }
         }
     }
 
-    private ArrayList<Event> firebasePull() {
-        final ArrayList<Event> events = new ArrayList<>();
-        fb.collection("some collection").get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+    private void firebasePull() {
+        fb.collection("events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    ArrayList<Event> tmp = new ArrayList<>();
+
                     @Override
-                    public void onSuccess(QuerySnapshot documentSnapshots) {
-                        if (documentSnapshots.isEmpty()) {
-                            Log.d(TAG, "onSuccess: LIST EMPTY");
-                            return;
-                        } else {
-                            // Convert the whole Query Snapshot to a list
-                            // of objects directly! No need to fetch each
-                            // document.
-                            List<Event> types = documentSnapshots.toObjects(Event.class);
-                            // Add all to your list
-                            events.addAll(types);
-                            Log.d(TAG, "onSuccess: " + events);
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Event e = document.toObject(Event.class);
+                                tmp.add(e);
+                                if (sqlVersionExists(e.getEventId())) {
+                                    db.eventDao().update(e);
+                                }
+                                else {
+                                    db.eventDao().insertEvent(e);
+                                }
+                            }
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "Error getting data!!!", Toast.LENGTH_LONG).show();
+                        for (Event e : db.eventDao().getAll()) {
+                            if (!fireBaseVersionExists(e.getEventId(), tmp)) {
+                                db.eventDao().delete(e);
+                            }
+                        }
+                        Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
+                        refresh();
+
                     }
                 });
-        return events;
     }
-
     private void removeOutdated(){
         Date currentTime = Calendar.getInstance().getTime();
         for(Event e: eventList.getEventList().getValue()){
@@ -388,57 +405,63 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void setFirebaseChangeListener() {
-        //Everything except the stuff inside the case statements was taken from firebase documentation, so it is probably good.
-        //The problem is that the changes seem to be empty
-        fb.collection("events")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot snapshots,
-                                        @Nullable FirebaseFirestoreException e) {
-                        System.out.println("onEvent called");
-                        if (e != null) {
-                            Log.w(TAG, "Data retrieval failed", e);
-                            return;
-                        }
+//     private void setFirebaseChangeListener() {
+//         //Everything except the stuff inside the case statements was taken from firebase documentation, so it is probably good.
+//         //The problem is that the changes seem to be empty
+//         fb.collection("events")
+//                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
+//                     @Override
+//                     public void onEvent(@Nullable QuerySnapshot snapshots,
+//                                         @Nullable FirebaseFirestoreException e) {
+//                         System.out.println("onEvent called");
+//                         if (e != null) {
+//                             Log.w(TAG, "Data retrieval failed", e);
+//                             return;
+//                         }
 
-                        for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                            System.out.println("Case statement: ");
-                            System.out.println(dc.getDocument().getData());
-                            String title = (String) dc.getDocument().get("title");
-                            String food = (String) dc.getDocument().get("food");
-                            String deets = (String) dc.getDocument().get("locationDetails");
-                            String startTime = (String) dc.getDocument().get("startTime");
-                            String endTime = (String) dc.getDocument().get("endTime");
-                            double latitude = (double) dc.getDocument().get("latitude");
-                            double longitude = (double) dc.getDocument().get("longitude");
-                            String imgRef = (String) dc.getDocument().get("imgRef");
+//                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
+//                             System.out.println("Case statement: ");
+//                             System.out.println(dc.getDocument().getData());
+//                             String title = (String) dc.getDocument().get("title");
+//                             String food = (String) dc.getDocument().get("food");
+//                             String deets = (String) dc.getDocument().get("locationDetails");
+//                             String startTime = (String) dc.getDocument().get("startTime");
+//                             String endTime = (String) dc.getDocument().get("endTime");
+//                             double latitude = (double) dc.getDocument().get("latitude");
+//                             double longitude = (double) dc.getDocument().get("longitude");
+//                             String imgRef = (String) dc.getDocument().get("imgRef");
 
-                            String firebaseID = dc.getDocument().getId();
-                            //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
+//                             String firebaseID = dc.getDocument().getId();
+//                             //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
 
-                            Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imgRef);
+//                             Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imgRef);
 
-                            System.out.println("Event for live data: " + newEvent.toString());
+//                             System.out.println("Event for live data: " + newEvent.toString());
 
-                            switch (dc.getType()) {
-                                case ADDED:
-                                    //eventList.eventList.getValue() will never be null
-                                    //ArrayList<Event> newEventList = eventList.eventList.getValue();
-                                    if(!sqlVersionExists(newEvent.getEventId()))
-                                        db.eventDao().insertEvent(newEvent);
-                                    break;
-                                case MODIFIED:
-                                    db.eventDao().update(newEvent);
-                                    break;
-                                case REMOVED:
-                                    db.eventDao().delete(newEvent);
-                                    break;
-                            }
-                        }
+//                             switch (dc.getType()) {
+//                                 case ADDED:
+//                                     //eventList.eventList.getValue() will never be null
+//                                     //ArrayList<Event> newEventList = eventList.eventList.getValue();
+//                                     if(!sqlVersionExists(newEvent.getEventId()))
+//                                         db.eventDao().insertEvent(newEvent);
+//                                     break;
+//                                 case MODIFIED:
+//                                     db.eventDao().update(newEvent);
+//                                     break;
+//                                 case REMOVED:
+//                                     db.eventDao().delete(newEvent);
+//                                     break;
+//                             }
+//                         }
 
-                    }
-                });
+//                     }
+//                 });
+    private boolean fireBaseVersionExists(String id, ArrayList<Event> fireBaseEvents){
+        for(Event e : fireBaseEvents){
+            if(e.getEventId().equals(id))
+                return true;
+        }
+        return false;
     }
 
     private boolean sqlVersionExists(String id) {
