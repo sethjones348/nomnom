@@ -68,11 +68,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EventList eventList;
 
-    private final FirebaseApp fbApp = FirebaseApp.initializeApp(this);
+    FirebaseApp fbApp;
 
-    private final FirebaseFirestore fb = FirebaseFirestore.getInstance(fbApp);
+    FirebaseFirestore fb;
 
-    FirebaseStorage storage = FirebaseStorage.getInstance();
+    FirebaseStorage storage;
 
     final String PREFS_NAME = "appPrefs";
 
@@ -82,6 +82,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fbApp = FirebaseApp.initializeApp(this);
+
+        fb = FirebaseFirestore.getInstance(fbApp);
+
+        storage = FirebaseStorage.getInstance();
 
         setFirebaseChangeListener();
 
