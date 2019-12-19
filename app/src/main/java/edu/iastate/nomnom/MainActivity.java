@@ -121,15 +121,18 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imageRef.toString());
                 Toast.makeText(this, "ID " + firebaseID, Toast.LENGTH_SHORT).show();
 
-                newEventRef.set(newEvent);
                 System.out.println("Data pushed");
                 intent.putExtra("data_change", false);
 
                 //add to SQLite database
-                if (getIntent().getBooleanExtra("isEdit", false)) {
+                if ((getIntent().getBooleanExtra("isEdit", false))) {
+                    String eventId = intent.getStringExtra("eventId");
+                    DocumentReference oldEventRef = fb.collection("events").document(eventId);
                     db.eventDao().update(newEvent);
+                    oldEventRef.set(newEvent);
                 }
                 else {
+                    newEventRef.set(newEvent);
                     db.eventDao().insertEvent(newEvent);
                 }
             }
