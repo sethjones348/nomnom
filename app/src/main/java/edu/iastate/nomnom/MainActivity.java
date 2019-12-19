@@ -227,7 +227,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void refresh(){
         removeOutdated();
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
-        placeMarkers();
+        //placeMarkers();
 
     }
 
@@ -383,6 +383,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
         }
+        //eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
 
 
     }
