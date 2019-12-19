@@ -63,8 +63,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final String TAG = " ";
 
-    private EventList tempEvents = new EventList();
-
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private GoogleMap mMap;
@@ -148,7 +146,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (settings.getBoolean("first_open", true)) {
 
-            updateSQL();
+            firebasePull();
             settings.edit().putBoolean("first_open", false).apply();
         }
 
@@ -322,52 +320,34 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void updateSQL() {
-        firebasePull();
-
-        for (Event e : tempEvents.eventList.getValue()) {
-            if (sqlVersionExists(e.getEventId())) {
-                db.eventDao().update(e);
-            }
-            else {
-                db.eventDao().insertEvent(e);
-            }
-        }
-        for (Event e : db.eventDao().getAll()) {
-            if (!tempEvents.eventList.getValue().contains(e)) {
-                db.eventDao().delete(e);
-            }
-        }
-    }
-
     private void firebasePull() {
         fb.collection("events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    ArrayList<Event> tmp = new ArrayList<>();
+            ArrayList<Event> tmp = new ArrayList<>();
 
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Event e = document.toObject(Event.class);
-                                tmp.add(e);
-                                if (sqlVersionExists(e.getEventId())) {
-                                    db.eventDao().update(e);
-                                }
-                                else {
-                                    db.eventDao().insertEvent(e);
-                                }
-                            }
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Event e = document.toObject(Event.class);
+                        tmp.add(e);
+                        if (sqlVersionExists(e.getEventId())) {
+                            db.eventDao().update(e);
                         }
-                        for (Event e : db.eventDao().getAll()) {
-                            if (!fireBaseVersionExists(e.getEventId(), tmp)) {
-                                db.eventDao().delete(e);
-                            }
+                        else {
+                            db.eventDao().insertEvent(e);
                         }
-                        Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
-                        refresh();
-
                     }
-                });
+                }
+                for (Event e : db.eventDao().getAll()) {
+                    if (!fireBaseVersionExists(e.getEventId(), tmp)) {
+                        db.eventDao().delete(e);
+                    }
+                }
+                Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
+                refresh();
+
+            }
+        });
     }
     private void removeOutdated(){
         Date currentTime = Calendar.getInstance().getTime();
@@ -443,7 +423,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 //                             }
 //                         }
 
-//                     }
+    //                     }
 //                 });
     private boolean fireBaseVersionExists(String id, ArrayList<Event> fireBaseEvents){
         for(Event e : fireBaseEvents){
