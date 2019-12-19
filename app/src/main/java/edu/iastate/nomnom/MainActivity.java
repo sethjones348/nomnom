@@ -105,7 +105,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             String firebaseID = newEventRef.getId();
 
             if (intent.getBooleanExtra("data_change", false)) {
-                //TODO add the new or updated event
                 String title = intent.getStringExtra("title");
                 String food = intent.getStringExtra("food");
                 String deets = intent.getStringExtra("locationDetails");
@@ -114,12 +113,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
                 byte[] byteArray = intent.getByteArrayExtra("photo");
-                Toast.makeText(MainActivity.this, "startD "+startTime+ " " + endTime, Toast.LENGTH_LONG).show();
                 StorageReference imageRef = uploadImage(firebaseID, byteArray);
-                //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
                 final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imageRef.toString());
-                Toast.makeText(this, "ID " + firebaseID, Toast.LENGTH_SHORT).show();
 
                 System.out.println("Data pushed");
                 intent.putExtra("data_change", false);
@@ -233,7 +229,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void refresh(){
         removeOutdated();
-        
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
 //        placeMarkers();
     }
@@ -370,11 +365,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             } catch (ParseException ex) {
                 ex.printStackTrace();
             }
-
         }
-        //eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
-
-
     }
 
 //     private void setFirebaseChangeListener() {

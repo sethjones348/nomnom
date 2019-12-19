@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,8 +28,6 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         event = database.eventDao().findByID(eventId);
 
-        Toast.makeText(EventDetailsActivity.this, "eventId: " + eventId, Toast.LENGTH_LONG).show();
-
         TextView title = findViewById(R.id.titleOutput);
         TextView food = findViewById(R.id.deetsOutput);
         TextView locationDetails = findViewById(R.id.locationOutput);
@@ -49,9 +46,6 @@ public class EventDetailsActivity extends AppCompatActivity {
 
         Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
         img.setImageBitmap(bmp);
-
-
-
     }
 
     public static Intent createIntent(Context context, String eventId) {

@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.TimePicker;
-import android.widget.Toast;
 import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -71,6 +70,7 @@ public class AddEventActivity extends AppCompatActivity {
             isEdit = true;
             eventID=intent.getStringExtra("editedEvent");
             Event event = db.eventDao().findByID(eventID);
+            db.eventDao().delete(event);
             latitude = event.getLatitude();
             longitude = event.getLongitude();
 
@@ -109,9 +109,6 @@ public class AddEventActivity extends AppCompatActivity {
             endTimeInput.setHour(endD.getHours());
             endTimeInput.setMinute(endD.getMinutes());
 
-
-
-
         }else {
             latitude = intent.getDoubleExtra("eventLatitude", 0.0);
             longitude = intent.getDoubleExtra("eventLongitude", 0.0);
@@ -135,9 +132,6 @@ public class AddEventActivity extends AppCompatActivity {
         String title = titleInput.getText().toString();
         String deets = deetsInput.getText().toString();
         String location = locationInput.getText().toString();
-        // String startTime = startTimeInput.getCurrentHour() + ":" + startTimeInput.getCurrentMinute();
-        // String endTime = endTimeInput.getCurrentHour() + ":" + endTimeInput.getCurrentMinute();
-        //TODO fix time format
         String strStart = formatTime(startTimeInput.getHour(),startTimeInput.getMinute());
         String strEnd = formatTime(endTimeInput.getHour(),endTimeInput.getMinute());
 
@@ -179,7 +173,6 @@ public class AddEventActivity extends AppCompatActivity {
         dt.setMinutes(minute);
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
         String time1 = sdf.format(dt);
-        Toast.makeText(AddEventActivity.this, "time "+time1, Toast.LENGTH_LONG).show();
         return time1;
     }
 
