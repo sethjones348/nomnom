@@ -29,7 +29,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class AddEventActivity extends AppCompatActivity {
 
-    private LatLng eventLocation;
+    private double latitude;
+    private double longitude;
     private ImageView img;
     private AppDatabase db;
     private byte[] byteArray;
@@ -95,8 +96,8 @@ public class AddEventActivity extends AppCompatActivity {
 
 
         }else{
-            eventLocation = new LatLng(intent.getDoubleExtra("eventLatitude", 0.0),
-                    intent.getDoubleExtra("eventLongitude", 0.0));
+            latitude = intent.getDoubleExtra("eventLatitude", 0.0);
+            longitude = intent.getDoubleExtra("eventLongitude", 0.0);
         }
     }
 
@@ -134,8 +135,8 @@ public class AddEventActivity extends AppCompatActivity {
         main.putExtra("locationDetails", location);
         main.putExtra("startTime", strStart);
         main.putExtra("endTime", strEnd);
-        main.putExtra("lat", eventLocation.latitude);
-        main.putExtra("long", eventLocation.longitude);
+        main.putExtra("lat", latitude);
+        main.putExtra("long", longitude);
         main.putExtra("data_change", true);
         main.putExtra("photo",byteArray);
         startActivity(main);
