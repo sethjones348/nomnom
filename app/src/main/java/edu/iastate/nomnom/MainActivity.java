@@ -279,12 +279,26 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void updateSQL(ArrayList<Event> events) {
         //TODO put new events in SQLite
+        for (Event e : events) {
+            if (sqlVersionExists(e.getEventId())) {
+                db.eventDao().update(e);
+            }
+            else {
+                db.eventDao().insertEvent(e);
+            }
+        }
+        for (Event e : db.eventDao().getAll()) {
+            if (!events.contains(e)) {
+                db.eventDao().delete(e);
+            }
+        }
     }
 
     private ArrayList<Event> firebasePull() {
         //TODO pull data from firebase
+        ArrayList<Event> events = (ArrayList) fb.collection("events").get().getResult().getDocuments();
+        return events;
 
-        return null;
     }
 
     private void setFirebaseChangeListener() {
@@ -350,7 +364,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 });
     }
 
-    private boolean sqlVersionExists(String id){
+    private boolean sqlVersionExists(String id) {
         return db.eventDao().findByID(id) != null;
     }
 
