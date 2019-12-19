@@ -87,6 +87,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         Intent intent = getIntent();
 
         if (intent != null) {
+            DocumentReference newEventRef = fb.collection("events").document();
+            String firebaseID = newEventRef.getId();
+
             if (intent.getBooleanExtra("data_change", false)) {
                 //TODO add the new or updated event
                 String title = intent.getStringExtra("title");
@@ -99,14 +102,23 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
-                DocumentReference newEventRef = fb.collection("events").document();
-                String firebaseID = newEventRef.getId();
-
                 final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
                 Toast.makeText(this, "ID " + firebaseID, Toast.LENGTH_SHORT).show();
 
                 newEventRef.set(newEvent);
                 System.out.println("Data pushed");
+
+                //add to SQLite database
+                db.eventDao().insertEvent(newEvent);
+            }
+            if(intent.getStringExtra("deletedEvent") != null){
+                String deletedEventId = intent.getStringExtra("deletedEvent");
+                Event deletedEvent = db.eventDao().findByID(deletedEventId);
+
+                DocumentReference deleteRef = fb.collection("events").document(deletedEventId);
+                deleteRef.delete();
+
+                //db.eventDao().delete(deletedEvent);
             }
         }
 
@@ -199,13 +211,19 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
          */
         //eventsRef.
 
-        ArrayList<Event> events = new ArrayList<>();
+        //ArrayList<Event> events = new ArrayList<>();
 
-        eventList.eventList.setValue(events);
+        //eventList.eventList.setValue(events);
     }
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
+        return intent;
+    }
+
+    public static Intent createIntent(Context context, String eventId) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra("deletedEvent", eventId);
         return intent;
     }
 
@@ -288,46 +306,48 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                            System.out.println("Case statement: ");
+                            System.out.println(dc.getDocument().getData());
+                            String title = (String) dc.getDocument().get("title");
+                            String food = (String) dc.getDocument().get("food");
+                            String deets = (String) dc.getDocument().get("locationDetails");
+                            String startTime = (String) dc.getDocument().get("startTime");
+                            String endTime = (String) dc.getDocument().get("endTime");
+                            double latitude = (double) dc.getDocument().get("latitude");
+                            double longitude = (double) dc.getDocument().get("longitude");
+
+                            double newLatitude = 0;
+                            double newLongitude = 0;
+
+
+                            String firebaseID = dc.getDocument().getId();
+                            //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
+
+                            Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
+
+                            System.out.println("Event for live data: " + newEvent.toString());
+
                             switch (dc.getType()) {
                                 case ADDED:
-                                    //TODO add new event to SQLite
-                                    System.out.println("Case statement: ");
-                                    System.out.println(dc.getDocument().getData());
-                                    String title = (String) dc.getDocument().get("title");
-                                    String food = (String) dc.getDocument().get("food");
-                                    String deets = (String) dc.getDocument().get("locationDetails");
-                                    String startTime = (String) dc.getDocument().get("startTime");
-                                    String endTime = (String) dc.getDocument().get("endTime");
-                                    double latitude = (double) dc.getDocument().get("latitude");
-                                    double longitude = (double) dc.getDocument().get("longitude");
+                                    //eventList.eventList.getValue() will never be null
+                                    //ArrayList<Event> newEventList = eventList.eventList.getValue();
 
-                                    double newLatitude = 0;
-                                    double newLongitude = 0;
+                                    Toast.makeText(getApplicationContext(), "LatitudeFB " + newEvent.getLatitude(), Toast.LENGTH_SHORT).show();
+                                    eventList.addEvent(newEvent);
 
-
-                                    String firebaseID = dc.getDocument().getId();
-                                    //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
-
-                                    Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
-
-                                    System.out.println("Event for live data: " + newEvent.toString());
-
-                                    ArrayList<Event> newEventList = eventList.eventList.getValue();
-
-                                    if (newEventList != null) {
-                                        Toast.makeText(getApplicationContext(), "LatitudeFB " + newEvent.getLatitude(), Toast.LENGTH_SHORT).show();
-                                        newEventList.add(newEvent);
-                                    }
-
-                                    //TODO don't do this in the final version, just for testing
-                                    eventList.eventList.setValue(newEventList);
+                                   // db.eventDao().insertEvent(newEvent);
 
                                     break;
                                 case MODIFIED:
-                                    //TODO update event in SQLite
+                                    Event deletedEvent = db.eventDao().findByID(newEvent.getEventId());
+                                    eventList.deleteEvent(deletedEvent);
+
+                                    //db.eventDao().insertEvent(newEvent);
+                                    eventList.addEvent(newEvent);
                                     break;
                                 case REMOVED:
-                                    //TODO remove event from SQLite
+                                    eventList.deleteEvent(newEvent);
+                                   // db.eventDao().delete(newEvent);
                                     break;
                             }
                         }
