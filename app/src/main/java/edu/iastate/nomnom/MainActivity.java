@@ -116,7 +116,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 System.out.println("Data pushed");
 
                 //add to SQLite database
-                db.eventDao().insertEvent(newEvent);
+                if (getIntent().getBooleanExtra("isEdit", false)) {
+                    db.eventDao().update(newEvent);
+                }
+                else {
+                    db.eventDao().insertEvent(newEvent);
+                }
             }
             if(intent.getStringExtra("deletedEvent") != null){
                 String deletedEventId = intent.getStringExtra("deletedEvent");
@@ -350,8 +355,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                                 case ADDED:
                                     //eventList.eventList.getValue() will never be null
                                     //ArrayList<Event> newEventList = eventList.eventList.getValue();
-
-                                    Toast.makeText(getApplicationContext(), "LatitudeFB " + newEvent.getLatitude(), Toast.LENGTH_SHORT).show();
 
                                     if(!sqlVersionExists(newEvent.getEventId()))
                                         db.eventDao().insertEvent(newEvent);
