@@ -47,4 +47,3 @@ public class EventList extends ViewModel {
         return -1;
     }
 }
-

@@ -3,6 +3,7 @@ package edu.iastate.nomnom;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -63,9 +64,13 @@ public class AddEventActivity extends AppCompatActivity {
             TimePicker startTimeInput = findViewById(R.id.start_time_picker);
             TimePicker endTimeInput = findViewById(R.id.end_time_picker);
 
+            byteArray=intent.getByteArrayExtra("imageToEdit");
             //img.setImageBitmap(even);
 
-            //Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+            Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+            img.setImageBitmap(bmp);
+
+
 
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
             Date startD=new Date();
@@ -73,6 +78,7 @@ public class AddEventActivity extends AppCompatActivity {
             try {
                 startD = sdf.parse(startTimeInput.toString());
                 endD = sdf.parse(endTimeInput.toString());
+
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -117,11 +123,12 @@ public class AddEventActivity extends AppCompatActivity {
         String title = titleInput.getText().toString();
         String deets = deetsInput.getText().toString();
         String location = locationInput.getText().toString();
-       // String startTime = startTimeInput.getCurrentHour() + ":" + startTimeInput.getCurrentMinute();
-       // String endTime = endTimeInput.getCurrentHour() + ":" + endTimeInput.getCurrentMinute();
+        // String startTime = startTimeInput.getCurrentHour() + ":" + startTimeInput.getCurrentMinute();
+        // String endTime = endTimeInput.getCurrentHour() + ":" + endTimeInput.getCurrentMinute();
         //TODO fix time format
         String strStart = formatTime(startTimeInput.getHour(),startTimeInput.getMinute());
         String strEnd = formatTime(endTimeInput.getHour(),endTimeInput.getMinute());
+
         main.putExtra("title", title);
         main.putExtra("food", deets);
         main.putExtra("locationDetails", location);
@@ -154,8 +161,11 @@ public class AddEventActivity extends AppCompatActivity {
 
     private String formatTime(int hour, int minute) {
         Date dt = new Date(2019,hour,minute);
+        dt.setHours(hour);
+        dt.setMinutes(minute);
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
         String time1 = sdf.format(dt);
+        Toast.makeText(AddEventActivity.this, "time "+time1, Toast.LENGTH_LONG).show();
         return time1;
     }
 
