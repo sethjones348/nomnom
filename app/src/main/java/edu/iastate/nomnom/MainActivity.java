@@ -69,11 +69,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EventList eventList;
 
-    private final FirebaseApp fbApp = FirebaseApp.initializeApp(this);
+    FirebaseApp fbApp;
 
-    private final FirebaseFirestore fb = FirebaseFirestore.getInstance(fbApp);
+    FirebaseFirestore fb;
 
-    FirebaseStorage storage = FirebaseStorage.getInstance();
+    FirebaseStorage storage;
 
     final String PREFS_NAME = "appPrefs";
 
@@ -84,7 +84,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        setFirebaseChangeListener();
+        fbApp = FirebaseApp.initializeApp(this);
+
+        fb = FirebaseFirestore.getInstance(fbApp);
+
+        storage = FirebaseStorage.getInstance();
 
         db = AppDatabase.getAppDatabase(this);
 
@@ -311,8 +315,20 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<Event> firebasePull() {
         final ArrayList<Event> events = new ArrayList<>();
 
-        CollectionReference eventList = fb.collection("events");
-        eventList.
+        fb.collection("events")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                events.add(document.toObject(Event.class));
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
 
         return events;
     }
