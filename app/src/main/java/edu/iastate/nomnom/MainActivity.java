@@ -205,15 +205,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        /* ToDo FireBaseStuff - Zach attack
-        update the eventList object here
-        and then delete the test cases when you are done
-         */
-        //eventsRef.
-
-        //ArrayList<Event> events = new ArrayList<>();
-
-        //eventList.eventList.setValue(events);
+        placeMarkers();
     }
 
     public static Intent createIntent(Context context) {
@@ -327,27 +319,31 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                             System.out.println("Event for live data: " + newEvent.toString());
 
+
                             switch (dc.getType()) {
                                 case ADDED:
                                     //eventList.eventList.getValue() will never be null
                                     //ArrayList<Event> newEventList = eventList.eventList.getValue();
 
                                     Toast.makeText(getApplicationContext(), "LatitudeFB " + newEvent.getLatitude(), Toast.LENGTH_SHORT).show();
-                                    eventList.addEvent(newEvent);
+//                                    eventList.addEvent(newEvent);
 
-                                   // db.eventDao().insertEvent(newEvent);
+                                    if(!sqlVersionExists(newEvent.getEventId()))
+                                        db.eventDao().insertEvent(newEvent);
 
                                     break;
                                 case MODIFIED:
                                     Event deletedEvent = db.eventDao().findByID(newEvent.getEventId());
-                                    eventList.deleteEvent(deletedEvent);
+//                                    eventList.deleteEvent(deletedEvent);
 
-                                    //db.eventDao().insertEvent(newEvent);
-                                    eventList.addEvent(newEvent);
+                                    if(!sqlVersionExists(newEvent.getEventId()))
+                                        db.eventDao().insertEvent(newEvent);
+                                    //eventList.addEvent(newEvent);
                                     break;
                                 case REMOVED:
-                                    eventList.deleteEvent(newEvent);
-                                   // db.eventDao().delete(newEvent);
+//                                    eventList.deleteEvent(newEvent);
+                                    if(!sqlVersionExists(newEvent.getEventId()))
+                                        db.eventDao().delete(newEvent);
                                     break;
                             }
                         }
@@ -355,4 +351,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
     }
+
+    private boolean sqlVersionExists(String id){
+        return db.eventDao().findByID(id) != null;
+    }
+
 }
