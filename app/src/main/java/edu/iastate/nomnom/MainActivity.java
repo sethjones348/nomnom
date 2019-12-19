@@ -125,6 +125,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                 newEventRef.set(newEvent);
                 System.out.println("Data pushed");
+                intent.putExtra("data_change", false);
 
                 //add to SQLite database
                 if (getIntent().getBooleanExtra("isEdit", false)) {
