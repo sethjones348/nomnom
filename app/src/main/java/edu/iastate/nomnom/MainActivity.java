@@ -13,6 +13,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -53,6 +56,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import java.util.Calendar;
 
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, Observer<ArrayList<Event>> {
 
@@ -105,7 +109,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
                 byte[] byteArray = intent.getByteArrayExtra("photo");
-
+                Toast.makeText(MainActivity.this, "startD "+startTime+ " " + endTime, Toast.LENGTH_LONG).show();
                 StorageReference imageRef = uploadImage(firebaseID, byteArray);
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
@@ -221,7 +225,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void refresh(){
+        removeOutdated();
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
+        placeMarkers();
+
     }
 
     public static Intent createIntent(Context context) {
@@ -275,12 +282,33 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
+
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Intent intent = EventDetailsActivity.createIntent(this.getApplicationContext(), (String) marker.getTag());
-
-        startActivity(intent);
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://nom-nom-dc909.appspot.com/images/" + (marker.getTag()));
+        final String eventId = (String) marker.getTag();
+        final long ONE_MEGABYTE = 1024 * 1024;
+        storageRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                sendBytes(bytes, eventId);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+            }
+        });
     }
+
+    private void sendBytes(byte[] bytes, String eventId){
+        Intent intent1 = EventDetailsActivity.createIntent(this.getApplicationContext(),bytes);
+        intent1.putExtra("eventId",eventId);
+
+        startActivity(intent1);
+    }
+
 
     @Override
     public void onChanged(ArrayList<Event> events) {
@@ -333,6 +361,30 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 });
         return events;
+    }
+
+    private void removeOutdated(){
+        Date currentTime = Calendar.getInstance().getTime();
+        for(Event e: eventList.getEventList().getValue()){
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
+            try {
+                Date temp = sdf.parse(e.getEndTime());
+                Date end =(Date)currentTime.clone();
+                end.setHours(temp.getHours());
+                end.setMinutes(temp.getMinutes());
+                end.setSeconds(temp.getSeconds());
+                if(end.getTime()<currentTime.getTime()){
+                    DocumentReference deleteRef = fb.collection("events").document(e.getEventId());
+                    deleteRef.delete();
+                    db.eventDao().delete(e);
+                }
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+            }
+
+        }
+
+
     }
 
     private void setFirebaseChangeListener() {
