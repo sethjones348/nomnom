@@ -63,8 +63,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final String TAG = " ";
 
-    private EventList tempEvents = new EventList();
-
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private GoogleMap mMap;
@@ -147,7 +145,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (settings.getBoolean("first_open", true)) {
 
-            updateSQL();
+            firebasePull();
             settings.edit().putBoolean("first_open", false).apply();
         }
 
@@ -318,24 +316,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     public void onChanged(ArrayList<Event> events) {
         if(mMap != null) {
             placeMarkers();
-        }
-    }
-
-    private void updateSQL() {
-        firebasePull();
-
-        for (Event e : tempEvents.eventList.getValue()) {
-            if (sqlVersionExists(e.getEventId())) {
-                db.eventDao().update(e);
-            }
-            else {
-                db.eventDao().insertEvent(e);
-            }
-        }
-        for (Event e : db.eventDao().getAll()) {
-            if (!tempEvents.eventList.getValue().contains(e)) {
-                db.eventDao().delete(e);
-            }
         }
     }
 
