@@ -333,15 +333,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
                                     break;
                                 case MODIFIED:
-                                    Event deletedEvent = db.eventDao().findByID(newEvent.getEventId());
-//                                    eventList.deleteEvent(deletedEvent);
-
                                     if(!sqlVersionExists(newEvent.getEventId()))
                                         db.eventDao().insertEvent(newEvent);
-                                    //eventList.addEvent(newEvent);
                                     break;
                                 case REMOVED:
-//                                    eventList.deleteEvent(newEvent);
                                     if(!sqlVersionExists(newEvent.getEventId()))
                                         db.eventDao().delete(newEvent);
                                     break;
