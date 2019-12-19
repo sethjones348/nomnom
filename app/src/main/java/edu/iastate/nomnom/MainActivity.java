@@ -205,7 +205,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        placeMarkers();
+        refresh();
+    }
+
+    private void refresh(){
+        eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
     }
 
     public static Intent createIntent(Context context) {
@@ -326,7 +330,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                                     //ArrayList<Event> newEventList = eventList.eventList.getValue();
 
                                     Toast.makeText(getApplicationContext(), "LatitudeFB " + newEvent.getLatitude(), Toast.LENGTH_SHORT).show();
-//                                    eventList.addEvent(newEvent);
 
                                     if(!sqlVersionExists(newEvent.getEventId()))
                                         db.eventDao().insertEvent(newEvent);
