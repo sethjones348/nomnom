@@ -1,9 +1,8 @@
 package edu.iastate.nomnom;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Database;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -36,8 +35,11 @@ public class Event {
     @ColumnInfo(name = "long")
     private double longitude;
 
+    @ColumnInfo(name = "imgRef")
+    private String imgRef;
+
     @Ignore
-    public Event(String eventID, String title, String food, double latitude, double longitude, String locationDetails, String startTime, String endTime) {
+    public Event(String eventID, String title, String food, double latitude, double longitude, String locationDetails, String startTime, String endTime, String imgRef) {
         this.eventId = eventID;
         this.title = title;
         this.latitude= latitude;
@@ -46,6 +48,7 @@ public class Event {
         this.startTime = startTime;
         this.endTime = endTime;
         this.food = food;
+        this.imgRef = imgRef;
     }
 
     public Event() {
@@ -114,6 +117,14 @@ public class Event {
 
     public void setFood(String details) {
         this.food = details;
+    }
+
+    public String getImgRef() {
+        return imgRef;
+    }
+
+    public void setImgRef(String imgRef) {
+        this.imgRef = imgRef;
     }
 
     @Override

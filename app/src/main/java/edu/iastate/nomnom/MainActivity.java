@@ -105,9 +105,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
                 byte[] byteArray = intent.getByteArrayExtra("photo");
+
+                StorageReference imageRef = uploadImage(firebaseID, byteArray);
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
-                final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
+                final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imageRef.toString());
                 Toast.makeText(this, "ID " + firebaseID, Toast.LENGTH_SHORT).show();
 
                 newEventRef.set(newEvent);
@@ -330,6 +332,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                             String endTime = (String) dc.getDocument().get("endTime");
                             double latitude = (double) dc.getDocument().get("latitude");
                             double longitude = (double) dc.getDocument().get("longitude");
+                            String imgRef = (String) dc.getDocument().get("imgRef");
 
                             double newLatitude = 0;
                             double newLongitude = 0;
@@ -338,7 +341,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                             String firebaseID = dc.getDocument().getId();
                             //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
 
-                            Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);
+                            Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imgRef);
 
                             System.out.println("Event for live data: " + newEvent.toString());
 
