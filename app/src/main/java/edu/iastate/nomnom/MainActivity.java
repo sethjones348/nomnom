@@ -99,7 +99,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 String endTime = intent.getStringExtra("endTime");
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
-
+                byte[] byteArray = intent.getByteArrayExtra("photo");
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
                 final Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime);

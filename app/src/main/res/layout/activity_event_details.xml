@@ -89,5 +89,11 @@
         android:layout_marginBottom="10dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <Button
+        android:id="@+id/editEvent"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:text="@string/editEvent" />
+
 
 </LinearLayout>

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.Button;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import java.io.ByteArrayOutputStream;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -22,6 +23,7 @@ public class AddEventActivity extends AppCompatActivity {
     private LatLng eventLocation;
     private ImageView img;
     private AppDatabase db;
+    private byte[] byteArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +80,7 @@ public class AddEventActivity extends AppCompatActivity {
         main.putExtra("latitude", eventLocation.latitude);
         main.putExtra("longitude", eventLocation.longitude);
         main.putExtra("data_change", true);
-
+        main.putExtra("photo",byteArray);
         startActivity(main);
     }
 
@@ -87,6 +89,11 @@ public class AddEventActivity extends AppCompatActivity {
         super.onActivityResult(requestCode,resultCode,intent);
         Bitmap bit = (Bitmap)intent.getExtras().get("data");
         img.setImageBitmap(bit);
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bit.compress(Bitmap.CompressFormat.PNG,100,stream);
+        byteArray = stream.toByteArray();
+
     }
 
 }
