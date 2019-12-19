@@ -228,7 +228,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void refresh(){
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
-        placeMarkers();
+//        placeMarkers();
     }
 
     public static Intent createIntent(Context context) {
