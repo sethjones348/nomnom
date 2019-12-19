@@ -35,6 +35,7 @@ public class AddEventActivity extends AppCompatActivity {
     private AppDatabase db;
     private byte[] byteArray;
     private String eventID;
+    private boolean isEdit;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -57,8 +58,11 @@ public class AddEventActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if(intent.getStringExtra("editedEvent") != null) {
+            isEdit = true;
             eventID=intent.getStringExtra("editedEvent");
             Event event = db.eventDao().findByID(eventID);
+            latitude = event.getLatitude();
+            longitude = event.getLongitude();
             EditText titleInput = findViewById(R.id.titleInput);
             EditText deetsInput = findViewById(R.id.deetsInput);
             EditText locationInput = findViewById(R.id.locationInput);
@@ -74,12 +78,20 @@ public class AddEventActivity extends AppCompatActivity {
 
 
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm aa");
+            Date currentTime = Calendar.getInstance().getTime();
             Date startD=new Date();
             Date endD=new Date();
+            startD.setTime(currentTime.getTime());
+            endD.setTime(currentTime.getTime());
             try {
-                startD = sdf.parse(startTimeInput.toString());
-                endD = sdf.parse(endTimeInput.toString());
-
+                startD = sdf.parse(event.getStartTime());
+                endD = sdf.parse(event.getEndTime());
+                startD.setMonth(currentTime.getMonth());
+                startD.setDate(currentTime.getDate());
+                startD.setYear(currentTime.getYear());
+                endD.setMonth(currentTime.getMonth());
+                endD.setDate(currentTime.getDate());
+                endD.setYear(currentTime.getYear());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -139,6 +151,8 @@ public class AddEventActivity extends AppCompatActivity {
         main.putExtra("long", longitude);
         main.putExtra("data_change", true);
         main.putExtra("photo",byteArray);
+        main.putExtra("isEdit", isEdit);
+        main.putExtra("eventId", eventID);
         startActivity(main);
     }
 
