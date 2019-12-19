@@ -38,6 +38,9 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 
 import java.lang.reflect.Array;
@@ -68,6 +71,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private final FirebaseApp fbApp = FirebaseApp.initializeApp(this);
 
     private final FirebaseFirestore fb = FirebaseFirestore.getInstance(fbApp);
+
+    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     final String PREFS_NAME = "appPrefs";
 
@@ -366,6 +371,25 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     private boolean sqlVersionExists(String id) {
         return db.eventDao().findByID(id) != null;
+    }
+
+    private StorageReference uploadImage(String filename, byte[] bytes) {
+        StorageReference storageRef = storage.getReference();
+        StorageReference imageRef = storageRef.child("images/" + filename);
+        UploadTask uploadTask = imageRef.putBytes(bytes);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                // ...
+            }
+        });
+        return imageRef;
     }
 
 }
