@@ -55,7 +55,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.Calendar;
@@ -81,8 +80,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     FirebaseFirestore fb;
 
     FirebaseStorage storage;
-
-    FirebaseStorage storage = FirebaseStorage.getInstance();
 
     final String PREFS_NAME = "appPrefs";
 
@@ -119,11 +116,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 double latitude = intent.getDoubleExtra("lat", 0);
                 double longitude = intent.getDoubleExtra("long", 0);
                 byte[] byteArray = intent.getByteArrayExtra("photo");
-<<<<<<< app/src/main/java/edu/iastate/nomnom/MainActivity.java
                 Toast.makeText(MainActivity.this, "startD "+startTime+ " " + endTime, Toast.LENGTH_LONG).show();
-=======
-
->>>>>>> app/src/main/java/edu/iastate/nomnom/MainActivity.java
                 StorageReference imageRef = uploadImage(firebaseID, byteArray);
                 //TODO push to firebase and get firebaseID (I think the code below does this properly)
 
@@ -239,12 +232,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void refresh(){
         removeOutdated();
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
-<<<<<<< app/src/main/java/edu/iastate/nomnom/MainActivity.java
-        //placeMarkers();
-
-=======
         placeMarkers();
->>>>>>> app/src/main/java/edu/iastate/nomnom/MainActivity.java
     }
 
     public static Intent createIntent(Context context) {
