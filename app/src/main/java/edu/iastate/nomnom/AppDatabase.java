@@ -21,7 +21,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     /**
      * Instantiates the AppDatabase for this app
-     * @param context
+     * @param context Context in which the AppDatabase is being created
      * @return INSTANCE The RoomDatabase instance for this app
      */
     public static AppDatabase getAppDatabase(Context context) {
