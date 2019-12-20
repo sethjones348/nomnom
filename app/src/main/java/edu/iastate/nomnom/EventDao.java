@@ -20,7 +20,7 @@ public interface EventDao {
 
     /**
      * Gets the event with the matching eventId from the database
-     * @param eventId
+     * @param eventId String eventId of the Event
      * @return Event with the matching eventId
      */
     @Query("SELECT * FROM event WHERE eventId LIKE :eventId")
@@ -28,21 +28,21 @@ public interface EventDao {
 
     /**
      * Inserts the event into the database
-     * @param event
+     * @param event Event to be inserted
      */
     @Insert
     void insertEvent(Event event);
 
     /**
      * Deletes the given event from the database
-     * @param event
+     * @param event Event to be deleted
      */
     @Delete
     void delete(Event event);
 
     /**
      * Updates the changed parameters of the given Event
-     * @param event
+     * @param event Event to be updated
      */
     @Update
     void update(Event event);

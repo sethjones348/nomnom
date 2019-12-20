@@ -44,7 +44,7 @@ public class AddEventActivity extends AppCompatActivity {
     /**
      * onCreate method that is called any time the activity is created. Recreates the view. If the intent came from the EventDetails class, then it populates fields
      * with data from the event that was being viewed
-     * @param savedInstanceState
+     * @param savedInstanceState the state of the app
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -122,9 +122,9 @@ public class AddEventActivity extends AppCompatActivity {
 
     /**
      * Creates an intent to this activity from the passed in context. Passes in the latitude and longitude of the event as extras
-     * @param context
-     * @param latLng
-     * @return
+     * @param context Context from which this was called
+     * @param latLng LatLng of the Event
+     * @return Intent that was created
      */
     public static Intent createIntent(Context context, LatLng latLng) {
         Intent intent = new Intent(context, AddEventActivity.class);
@@ -138,7 +138,7 @@ public class AddEventActivity extends AppCompatActivity {
 
     /**
      * onClick method for the add button. Creates an intent to main activity and passes in the event fields
-     * @param view
+     * @param view View of the Add button
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickAdd(View view) {
@@ -187,8 +187,8 @@ public class AddEventActivity extends AppCompatActivity {
 
     /**
      * Creates an intent to this class from the given context. Passes in the eventId of the edited event
-     * @param context
-     * @param eventId
+     * @param context Context from which this was called
+     * @param eventId eventId of the Event
      * @return
      */
     public static Intent createIntent(Context context,String eventId) {
