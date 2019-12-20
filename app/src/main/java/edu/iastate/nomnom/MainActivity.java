@@ -59,30 +59,72 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import java.util.Calendar;
 
+/**
+ * The class which represents the main page of the app, it is a map by Google
+ */
 public class MainActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnInfoWindowClickListener, Observer<ArrayList<Event>> {
 
+    /**
+     * Field that keeps track of error messages when methods could be succesful or fail
+     */
     private static final String TAG = " ";
 
+    /**
+     * A google play services field which allows the app to access the user's location
+     */
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
+    /**
+     * A Google Map object which allows the main page of NomNom to be a map by Google
+     */
     private GoogleMap mMap;
 
+    /**
+     * A boolean that keeps track of if the user is trying to add an event or not, if true, then tapping the screen takaes the user to the AddEventActivity
+     */
     private boolean addEvent;
 
+    /**
+     * A LatLng which contains the location where the user wants to add an event at
+     */
     private LatLng addEventLocation;
 
+    /**
+     * A ViewModel which contains all of the events that are currently in the SQLite database
+     */
     private EventList eventList;
 
+    /**
+     * Represents the firebase app that is being utilized
+     */
     FirebaseApp fbApp;
 
+    /**
+     * Represents the FireStore which is being utilized in the app
+     */
     FirebaseFirestore fb;
 
+    /**
+     * Represents the firebase storage that is being utilized in the app
+     */
     FirebaseStorage storage;
 
+    /**
+     * A string which allows the app to utilize shared preferences to see if the user is opening the app for the first time
+     */
     final String PREFS_NAME = "appPrefs";
 
+    /**
+     * Represents the SQLite database which the users phone will be housing
+     */
     private AppDatabase db;
 
+    /**
+     * Acts as a constructor for the main activity. It is called everytime the page is visited, and it initializes
+     * all of the variables and objects which require initializing.
+     *
+     * @param savedInstanceState the state of the app
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,6 +219,10 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         firebasePull();
     }
 
+    /**
+     *Called when the map is ready to be used
+     * @param googleMap the google map object which will be assigned to the mMap instance variable
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -230,20 +276,39 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private void refresh(){
         removeOutdated();
         eventList.eventList.setValue((ArrayList) db.eventDao().getAll());
-//        placeMarkers();
     }
 
+    /**
+     * Creates an intent which will return the user to the main activity
+     * @param context
+     * @return returns the intent that needs to be passed in to startActivity as a parameter
+     *         from the activity that is being traveled from
+     */
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         return intent;
     }
 
+    /**
+     * Creates an intent which contains the ID of the event that is deleted in EventDetailsActivity,
+     * it also returns the user to the main page when deleting an event
+     * @param context will be the context of the activity being traveled from
+     * @param eventId the event ID of the event which was deleted in EventDetailsActivity
+     * @return returns the intent which is created
+     */
     public static Intent createIntent(Context context, String eventId) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.putExtra("deletedEvent", eventId);
         return intent;
     }
 
+    /**
+     * An onClick method for the add_event button. This sets the boolean addEvent flag to true, causing the app to
+     * wait for human input on the map, it then displays a toast giving the user instructions on how to add an event
+     *
+     * It also conceals the add_event button and reveals the cancel button
+     * @param view the button which this onClick method is associated with
+     */
     public void onAddEventClicked(View view) {
         Button add_event = findViewById(R.id.add_event);
         Button cancel_button = findViewById(R.id.cancel);
@@ -255,12 +320,24 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(MainActivity.this, "Tap where you want to add an event or cancel", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * An onClick method for the cancel button. It works by setting the boolean addEvent to false, and it
+     * conceals the cancel button and reveals the add_event button once more
+     *
+     * @param view the button which this onClick method is associated with
+     */
     public void onCancelClicked(View view){
         addEvent = false;
 
         view.setVisibility(View.GONE);
         findViewById(R.id.add_event).setVisibility(View.VISIBLE);
     }
+
+    /**
+     * Is always listening for the touch on the map of the user, but only carries out functionality
+     * if the boolean addEvent has the value true
+     * @param latLng the location where the user taps
+     */
     @Override
     public void onMapClick(LatLng latLng) {
         if(addEvent) {
@@ -284,8 +361,15 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
-
+    /**
+     * An onClick listener for the info windows that appear when the user taps on a marker. It retrieves the url
+     * associated with the event that the marker is representing. If that is successful, then the method will
+     * create an intent for event details and then send the user to the event details along with the
+     * corresponding event Id of the event which the marker is representing
+     *
+     * @param marker the marker that is representing an event in the event list whose tag is the event
+     *               id of said event
+     */
     @Override
     public void onInfoWindowClick(Marker marker) {
         StorageReference storageRef = storage.getReferenceFromUrl("gs://nom-nom-dc909.appspot.com/images/" + (marker.getTag()));
@@ -312,6 +396,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
+    /**
+     * This method is called anytime the MutableLiveData field of the EventList ViewModel is changed.
+     * It calls a helper method, placeMarkers(), which places a marker at the location of each event in the EventList
+     *
+     * @param events the MutableLiveData object in the EventList ViewModel which contains all of the events
+     *               in the SQLite database
+     */
     @Override
     public void onChanged(ArrayList<Event> events) {
         if(mMap != null) {
@@ -319,6 +410,9 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Private method which refreshes the SQLite database with the data from Firebase
+     */
     private void firebasePull() {
         fb.collection("events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             ArrayList<Event> tmp = new ArrayList<>();
@@ -368,57 +462,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-//     private void setFirebaseChangeListener() {
-//         //Everything except the stuff inside the case statements was taken from firebase documentation, so it is probably good.
-//         //The problem is that the changes seem to be empty
-//         fb.collection("events")
-//                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                     @Override
-//                     public void onEvent(@Nullable QuerySnapshot snapshots,
-//                                         @Nullable FirebaseFirestoreException e) {
-//                         System.out.println("onEvent called");
-//                         if (e != null) {
-//                             Log.w(TAG, "Data retrieval failed", e);
-//                             return;
-//                         }
 
-//                         for (DocumentChange dc : snapshots.getDocumentChanges()) {
-//                             System.out.println("Case statement: ");
-//                             System.out.println(dc.getDocument().getData());
-//                             String title = (String) dc.getDocument().get("title");
-//                             String food = (String) dc.getDocument().get("food");
-//                             String deets = (String) dc.getDocument().get("locationDetails");
-//                             String startTime = (String) dc.getDocument().get("startTime");
-//                             String endTime = (String) dc.getDocument().get("endTime");
-//                             double latitude = (double) dc.getDocument().get("latitude");
-//                             double longitude = (double) dc.getDocument().get("longitude");
-//                             String imgRef = (String) dc.getDocument().get("imgRef");
-
-//                             String firebaseID = dc.getDocument().getId();
-//                             //StorageReference imgRef = (StorageReference) dc.getDocument().getData().get("imgRef");
-
-//                             Event newEvent = new Event(firebaseID, title, food, latitude, longitude, deets, startTime, endTime, imgRef);
-
-//                             System.out.println("Event for live data: " + newEvent.toString());
-
-//                             switch (dc.getType()) {
-//                                 case ADDED:
-//                                     //eventList.eventList.getValue() will never be null
-//                                     //ArrayList<Event> newEventList = eventList.eventList.getValue();
-//                                     if(!sqlVersionExists(newEvent.getEventId()))
-//                                         db.eventDao().insertEvent(newEvent);
-//                                     break;
-//                                 case MODIFIED:
-//                                     db.eventDao().update(newEvent);
-//                                     break;
-//                                 case REMOVED:
-//                                     db.eventDao().delete(newEvent);
-//                                     break;
-//                             }
-//                         }
-
-    //                     }
-//                 });
     private boolean fireBaseVersionExists(String id, ArrayList<Event> fireBaseEvents){
         for(Event e : fireBaseEvents){
             if(e.getEventId().equals(id))
@@ -450,6 +494,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         return imageRef;
     }
 
+    /**
+     * An onClick method for the button Refresh. Anytime this button is pushed, the app will update the
+     * SQLite database to match the data of the Firebase database
+     *
+     * @param view the Refresh button associated with this onClick method
+     */
     public void onRefreshClicked(View view) {
         firebasePull();
     }
