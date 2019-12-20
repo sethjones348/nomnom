@@ -35,12 +35,17 @@ public class AddEventActivity extends AppCompatActivity {
     private byte[] byteArray;
     private String eventID;
     private boolean isEdit;
-    EditText titleInput ;
-    EditText deetsInput ;
-    EditText locationInput ;
-    TimePicker startTimeInput;
-    TimePicker endTimeInput;
+    private EditText titleInput ;
+    private EditText deetsInput ;
+    private EditText locationInput ;
+    private TimePicker startTimeInput;
+    private TimePicker endTimeInput;
 
+    /**
+     * onCreate method that is called any time the activity is created. Recreates the view. If the intent came from the EventDetails class, then it populates fields
+     * with data from the event that was being viewed
+     * @param savedInstanceState
+     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +120,12 @@ public class AddEventActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates an intent to this activity from the passed in context. Passes in the latitude and longitude of the event as extras
+     * @param context
+     * @param latLng
+     * @return
+     */
     public static Intent createIntent(Context context, LatLng latLng) {
         Intent intent = new Intent(context, AddEventActivity.class);
 
@@ -125,6 +136,10 @@ public class AddEventActivity extends AppCompatActivity {
         return intent;
     }
 
+    /**
+     * onClick method for the add button. Creates an intent to main activity and passes in the event fields
+     * @param view
+     */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void onClickAdd(View view) {
         Intent main = MainActivity.createIntent(this);
@@ -149,6 +164,12 @@ public class AddEventActivity extends AppCompatActivity {
         startActivity(main);
     }
 
+    /**
+     * Called when the camera returns a value. Updates the byteArray variable with the new image
+     * @param requestCode
+     * @param resultCode
+     * @param intent
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent){
         super.onActivityResult(requestCode,resultCode,intent);
@@ -161,6 +182,12 @@ public class AddEventActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Creates an intent to this class from the given context. Passes in the eventId of the edited event
+     * @param context
+     * @param eventId
+     * @return
+     */
     public static Intent createIntent(Context context,String eventId) {
         Intent intent = new Intent(context, AddEventActivity.class);
         intent.putExtra("editedEvent", eventId);
