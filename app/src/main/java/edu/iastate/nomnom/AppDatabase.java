@@ -13,8 +13,17 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase INSTANCE;
 
+    /**
+     * The EventDao instance for this app
+     * @return EventDao instance of the app
+     */
     public abstract EventDao eventDao();
 
+    /**
+     * Instantiates the AppDatabase for this app
+     * @param context
+     * @return INSTANCE The RoomDatabase instance for this app
+     */
     public static AppDatabase getAppDatabase(Context context) {
         if (INSTANCE == null) {
             INSTANCE =
@@ -26,7 +35,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
-    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE events "
@@ -34,6 +43,9 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    /**
+     * Destroys the AppDatabase instance
+     */
     public static void destroyInstance() {
         INSTANCE = null;
     }
