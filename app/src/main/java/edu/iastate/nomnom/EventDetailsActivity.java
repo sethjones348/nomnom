@@ -11,12 +11,31 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * An activity to display details about an event clicked on the map
+ */
 public class EventDetailsActivity extends AppCompatActivity {
 
+    /**
+     * an Event object create to keep track of all the details for an event
+     */
     private Event event;
 
+    /**
+     * database object to get up to date details about the event
+     */
     AppDatabase database;
+
+    /**
+     * a variable to record the image taken
+     */
     private byte[] byteArray;
+
+    /**
+     * onCreate method that is called any time the activity is created. Recreates the view. It gets an intent from main acitvity with the event ID of the event that the user wants to view
+     * @param savedInstanceState
+     *      keeps track of the current state of the app to update the details up-to-date
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,18 +67,21 @@ public class EventDetailsActivity extends AppCompatActivity {
         img.setImageBitmap(bmp);
     }
 
-    public static Intent createIntent(Context context, String eventId) {
-        Intent intent = new Intent(context, EventDetailsActivity.class);
-
-        intent.putExtra("eventId", eventId);
-        return intent;
-    }
-
+    /**
+     * method created to send the this event's ID to main in order to get it deleted, which is triggered by clicking on the delete button in this view
+     * @param view
+     *      The current view of the app
+     */
     public void deleteEvent(View view) {
         Intent intent = MainActivity.createIntent(this, event.getEventId());
         startActivity(intent);
     }
 
+    /**
+     * method created to send the this event's ID to AddEventActivity in order to allow one to edit this event, which is triggered by clicking on the edit button in this view
+            * @param view
+     *      The current view of the app
+     */
     public void editEvent(View view){
         Intent intent = AddEventActivity.createIntent(this,event.getEventId());
         intent.putExtra("isEdit", true);
@@ -67,6 +89,15 @@ public class EventDetailsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * a method created to send the image of an event as byte array into an intent to this class
+     * @param context
+     *      the context refers to the method the information comes from, which in this case in AddEventActivity
+     * @param bytes
+     *      the byte array that needs to be stored in the intent
+     * @return
+     *      the intent that needs to be sent to this class
+     */
     public static Intent createIntent(Context context, byte[] bytes) {
         Intent intent = new Intent(context, EventDetailsActivity.class);
 

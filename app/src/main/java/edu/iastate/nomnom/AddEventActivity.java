@@ -167,8 +167,11 @@ public class AddEventActivity extends AppCompatActivity {
     /**
      * Called when the camera returns a value. Updates the byteArray variable with the new image
      * @param requestCode
+     *      the code that is used to describe the situation of the camera
      * @param resultCode
+     *      the code that is used to declare when the picture has been taken
      * @param intent
+     *       an intent object that stores the image taken
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent){
